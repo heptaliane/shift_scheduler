@@ -4,7 +4,7 @@ use rand::thread_rng;
 pub trait IndexPicker {
     fn pick<T, const N: usize>(&self, arr: &[T; N]) -> Result<usize, ()>;
 
-    fn pickn<T, const N: usize>(&self, arr: &[T; N], n: usize) -> Result<Vec<usize>, ()>;
+    fn pick_multiple<T, const N: usize>(&self, arr: &[T; N], n: usize) -> Result<Vec<usize>, ()>;
 }
 
 pub struct SequentialIndexPicker {}
@@ -17,7 +17,7 @@ impl IndexPicker for SequentialIndexPicker {
         }
     }
 
-    fn pickn<T, const N: usize>(&self, _arr: &[T; N], n: usize) -> Result<Vec<usize>, ()> {
+    fn pick_multiple<T, const N: usize>(&self, _arr: &[T; N], n: usize) -> Result<Vec<usize>, ()> {
         match N < n {
             true => Err(()),
             false => Ok((0..n).collect()),
@@ -37,7 +37,7 @@ impl IndexPicker for RandomIndexPicker {
         }
     }
 
-    fn pickn<T, const N: usize>(&self, _arr: &[T; N], n: usize) -> Result<Vec<usize>, ()> {
+    fn pick_multiple<T, const N: usize>(&self, _arr: &[T; N], n: usize) -> Result<Vec<usize>, ()> {
         match N < n {
             true => Err(()),
             false => {
@@ -57,8 +57,8 @@ fn test_sequential_index_picker() {
 
     assert_eq!(picker.pick(&arr1), Ok(0));
     assert_eq!(picker.pick(&arr2), Err(()));
-    assert_eq!(picker.pickn(&arr1, 3), Ok(vec![0, 1, 2]));
-    assert_eq!(picker.pickn(&arr1, 10), Err(()));
+    assert_eq!(picker.pick_multiple(&arr1, 3), Ok(vec![0, 1, 2]));
+    assert_eq!(picker.pick_multiple(&arr1, 10), Err(()));
 }
 
 #[test]
@@ -69,6 +69,6 @@ fn test_random_index_picker() {
 
     assert!(picker.pick(&arr1).is_ok());
     assert!(picker.pick(&arr2).is_err());
-    assert!(picker.pickn(&arr1, 3).is_ok());
-    assert!(picker.pickn(&arr1, 10).is_err());
+    assert!(picker.pick_multiple(&arr1, 3).is_ok());
+    assert!(picker.pick_multiple(&arr1, 10).is_err());
 }
