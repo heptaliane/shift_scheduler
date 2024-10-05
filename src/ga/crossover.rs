@@ -1,17 +1,17 @@
 use super::picker::IndexPicker;
 
-pub trait CrossOver {
+pub trait Crossover {
     fn crossover(&self, a: &Vec<bool>, b: &Vec<bool>) -> Result<(Vec<bool>, Vec<bool>), ()>;
 }
 
-pub struct OnePointCrossOver<P>
+pub struct OnePointCrossover<P>
 where
     P: IndexPicker,
 {
     picker: P,
 }
 
-impl<P> CrossOver for OnePointCrossOver<P>
+impl<P> Crossover for OnePointCrossover<P>
 where
     P: IndexPicker,
 {
@@ -29,7 +29,7 @@ where
     }
 }
 
-pub struct KPointCrossOver<P>
+pub struct KPointCrossover<P>
 where
     P: IndexPicker,
 {
@@ -37,14 +37,14 @@ where
     picker: P,
 }
 
-impl<P> CrossOver for KPointCrossOver<P>
+impl<P> Crossover for KPointCrossover<P>
 where
     P: IndexPicker,
 {
     fn crossover(&self, a: &Vec<bool>, b: &Vec<bool>) -> Result<(Vec<bool>, Vec<bool>), ()> {
         match a.len() {
             n if n == b.len() => {
-                let indices = self.picker.pick_multiple(n, self.k)?;
+                let indices = self.picker.pick_n(n, self.k)?;
                 let mut index_iter = indices.iter().enumerate().peekable();
 
                 let mut new_a: Vec<bool> = Vec::new();
@@ -70,7 +70,7 @@ where
 fn test_one_point_crossover() {
     use super::picker::SequentialIndexPicker;
     let picker = SequentialIndexPicker {};
-    let crossover = OnePointCrossOver { picker };
+    let crossover = OnePointCrossover { picker };
 
     let mut arr1 = vec![true; 3];
     let arr2 = vec![false; 3];
@@ -96,7 +96,7 @@ fn test_k_point_crossover() {
     let arr3 = vec![true; 1];
 
     let picker = SequentialIndexPicker {};
-    let crossover1 = KPointCrossOver { picker, k: 2 };
+    let crossover1 = KPointCrossover { picker, k: 2 };
 
     let expected1 = Ok((vec![false, true, true], vec![true, false, false]));
     let actual1 = crossover1.crossover(&arr1, &arr2);
@@ -105,7 +105,7 @@ fn test_k_point_crossover() {
     assert!(crossover1.crossover(&arr1, &arr3).is_err());
 
     let picker = SequentialIndexPicker {};
-    let crossover2 = KPointCrossOver { picker, k: 5 };
+    let crossover2 = KPointCrossover { picker, k: 5 };
 
     assert!(crossover2.crossover(&arr1, &arr2).is_err());
 }
