@@ -1,35 +1,35 @@
 use super::fitness::Fitness;
-use rand::distributions::uniform::SampleBorrow;
 use rand::distributions::weighted::WeightedIndex;
 use rand::distributions::Distribution;
+use rand::rngs::ThreadRng;
 use rand::thread_rng;
 
 pub trait Selection {
-    fn select(
-        &self,
-        individuals: &Vec<Vec<bool>>,
-        samples: usize,
-    ) -> Result<Vec<(usize, usize)>, ()>;
+    fn get_selection_iter(&self, individuals: &Vec<Vec<bool>>) -> Result<SelectionIter, ()>;
 }
 
-fn weighted_select<I>(weights: I, samples: usize) -> Result<Vec<(usize, usize)>, ()>
-where
-    I: IntoIterator,
-    I::Item: SampleBorrow<f32>,
-{
-    match WeightedIndex::new(weights) {
-        Ok(distributions) => {
-            let mut rng = thread_rng();
-            Ok((0..samples)
-                .map(|_| {
-                    (
-                        distributions.sample(&mut rng),
-                        distributions.sample(&mut rng),
-                    )
-                })
-                .collect())
+pub struct SelectionIter {
+    weights: WeightedIndex<f32>,
+    rng: ThreadRng,
+}
+
+impl SelectionIter {
+    fn new(weights: WeightedIndex<f32>) -> Self {
+        Self {
+            weights,
+            rng: thread_rng(),
         }
-        _ => Err(()),
+    }
+}
+
+impl Iterator for SelectionIter {
+    type Item = (usize, usize);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        Some((
+            self.weights.sample(&mut self.rng),
+            self.weights.sample(&mut self.rng),
+        ))
     }
 }
 
@@ -44,13 +44,12 @@ impl<F> Selection for RouletteWheelSelection<F>
 where
     F: Fitness,
 {
-    fn select(
-        &self,
-        individuals: &Vec<Vec<bool>>,
-        samples: usize,
-    ) -> Result<Vec<(usize, usize)>, ()> {
+    fn get_selection_iter(&self, individuals: &Vec<Vec<bool>>) -> Result<SelectionIter, ()> {
         let fitness = individuals.iter().map(|i| self.fitness.calculate(i));
-        weighted_select(fitness, samples)
+        match WeightedIndex::new(fitness) {
+            Ok(weights) => Ok(SelectionIter::new(weights)),
+            _ => Err(()),
+        }
     }
 }
 
@@ -68,11 +67,7 @@ where
     F: Fitness,
     G: Fn(usize) -> f32,
 {
-    fn select(
-        &self,
-        individuals: &Vec<Vec<bool>>,
-        samples: usize,
-    ) -> Result<Vec<(usize, usize)>, ()> {
+    fn get_selection_iter(&self, individuals: &Vec<Vec<bool>>) -> Result<SelectionIter, ()> {
         let mut indexed_fitness: Vec<(usize, f32)> = individuals
             .iter()
             .map(|v| self.fitness.calculate(v))
@@ -88,7 +83,11 @@ where
         let weights = indexed_rank
             .iter()
             .map(|&(_, rank)| (self.probability)(rank));
-        weighted_select(weights, samples)
+
+        match WeightedIndex::new(weights) {
+            Ok(weights) => Ok(SelectionIter::new(weights)),
+            _ => Err(()),
+        }
     }
 }
 
@@ -104,17 +103,17 @@ fn test_roulette_wheel_selection() {
         vec![true, true, false],
         vec![true, false, false],
     ];
-    assert!(selection.select(&individuals1, 2).is_ok());
+    assert!(selection.get_selection_iter(&individuals1).is_ok());
 
     let individuals2 = vec![vec![true; 3]];
-    assert!(selection.select(&individuals2, 2).is_ok());
+    assert!(selection.get_selection_iter(&individuals2).is_ok());
 
     // non-positive fitness is not acceptable
     let individuals3 = vec![vec![false; 3]];
-    assert!(selection.select(&individuals3, 2).is_err());
+    assert!(selection.get_selection_iter(&individuals3).is_err());
 
     let individuals4: Vec<Vec<bool>> = Vec::new();
-    assert!(selection.select(&individuals4, 2).is_err());
+    assert!(selection.get_selection_iter(&individuals4).is_err());
 }
 
 #[test]
@@ -133,14 +132,14 @@ fn test_rank_selection() {
         vec![true, true, false],
         vec![true, false, false],
     ];
-    assert!(selection.select(&individuals1, 2).is_ok());
+    assert!(selection.get_selection_iter(&individuals1).is_ok());
 
     let individuals2 = vec![vec![true; 3]];
-    assert!(selection.select(&individuals2, 2).is_ok());
+    assert!(selection.get_selection_iter(&individuals2).is_ok());
 
     let individuals3 = vec![vec![false; 3]];
-    assert!(selection.select(&individuals3, 2).is_ok());
+    assert!(selection.get_selection_iter(&individuals3).is_ok());
 
     let individuals4: Vec<Vec<bool>> = Vec::new();
-    assert!(selection.select(&individuals4, 2).is_err());
+    assert!(selection.get_selection_iter(&individuals4).is_err());
 }
