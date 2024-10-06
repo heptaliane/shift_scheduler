@@ -1,11 +1,10 @@
-use super::fitness::Fitness;
 use rand::distributions::weighted::WeightedIndex;
 use rand::distributions::Distribution;
 use rand::rngs::ThreadRng;
 use rand::thread_rng;
 
 pub trait Selection {
-    fn get_selection_iter(&self, individuals: &Vec<Vec<bool>>) -> Result<SelectionIter, ()>;
+    fn get_selection_iter(&self, fitness: &Vec<f32>) -> Result<SelectionIter, ()>;
 }
 
 pub struct SelectionIter {
@@ -33,19 +32,10 @@ impl Iterator for SelectionIter {
     }
 }
 
-pub struct RouletteWheelSelection<F>
-where
-    F: Fitness,
-{
-    fitness: F,
-}
+pub struct RouletteWheelSelection {}
 
-impl<F> Selection for RouletteWheelSelection<F>
-where
-    F: Fitness,
-{
-    fn get_selection_iter(&self, individuals: &Vec<Vec<bool>>) -> Result<SelectionIter, ()> {
-        let fitness = individuals.iter().map(|i| self.fitness.calculate(i));
+impl Selection for RouletteWheelSelection {
+    fn get_selection_iter(&self, fitness: &Vec<f32>) -> Result<SelectionIter, ()> {
         match WeightedIndex::new(fitness) {
             Ok(weights) => Ok(SelectionIter::new(weights)),
             _ => Err(()),
@@ -53,26 +43,20 @@ where
     }
 }
 
-pub struct RankSelection<F, G>
+pub struct RankSelection<F>
 where
-    F: Fitness,
-    G: Fn(usize) -> f32,
+    F: Fn(usize) -> f32,
 {
-    fitness: F,
-    probability: G,
+    probability: F,
 }
 
-impl<F, G> Selection for RankSelection<F, G>
+impl<F> Selection for RankSelection<F>
 where
-    F: Fitness,
-    G: Fn(usize) -> f32,
+    F: Fn(usize) -> f32,
 {
-    fn get_selection_iter(&self, individuals: &Vec<Vec<bool>>) -> Result<SelectionIter, ()> {
-        let mut indexed_fitness: Vec<(usize, f32)> = individuals
-            .iter()
-            .map(|v| self.fitness.calculate(v))
-            .enumerate()
-            .collect();
+    fn get_selection_iter(&self, fitness: &Vec<f32>) -> Result<SelectionIter, ()> {
+        let mut indexed_fitness: Vec<(usize, f32)> =
+            fitness.iter().enumerate().map(|(i, &f)| (i, f)).collect();
         indexed_fitness.sort_by(|&(_, a), &(_, b)| a.partial_cmp(&b).unwrap());
         let mut indexed_rank: Vec<(usize, usize)> = indexed_fitness
             .iter()
@@ -93,53 +77,36 @@ where
 
 #[test]
 fn test_roulette_wheel_selection() {
-    use super::fitness::CountFitness;
+    let selection = RouletteWheelSelection {};
 
-    let fitness = CountFitness {};
-    let selection = RouletteWheelSelection { fitness };
+    let fitness1 = vec![1.0, 2.0, 3.0];
+    assert!(selection.get_selection_iter(&fitness1).is_ok());
 
-    let individuals1 = vec![
-        vec![true, true, true],
-        vec![true, true, false],
-        vec![true, false, false],
-    ];
-    assert!(selection.get_selection_iter(&individuals1).is_ok());
-
-    let individuals2 = vec![vec![true; 3]];
-    assert!(selection.get_selection_iter(&individuals2).is_ok());
+    let fitness2 = vec![1.0];
+    assert!(selection.get_selection_iter(&fitness2).is_ok());
 
     // non-positive fitness is not acceptable
-    let individuals3 = vec![vec![false; 3]];
-    assert!(selection.get_selection_iter(&individuals3).is_err());
+    let fitness3 = vec![0.0; 3];
+    assert!(selection.get_selection_iter(&fitness3).is_err());
 
-    let individuals4: Vec<Vec<bool>> = Vec::new();
-    assert!(selection.get_selection_iter(&individuals4).is_err());
+    let fitness4: Vec<f32> = Vec::new();
+    assert!(selection.get_selection_iter(&fitness4).is_err());
 }
 
 #[test]
 fn test_rank_selection() {
-    use super::fitness::CountFitness;
-
-    let fitness = CountFitness {};
     let probability = |rank: usize| 1.0 / ((rank + 1) as f32);
-    let selection = RankSelection {
-        fitness,
-        probability,
-    };
+    let selection = RankSelection { probability };
 
-    let individuals1 = vec![
-        vec![true, true, true],
-        vec![true, true, false],
-        vec![true, false, false],
-    ];
-    assert!(selection.get_selection_iter(&individuals1).is_ok());
+    let fitness1 = vec![1.0, 2.0, 3.0];
+    assert!(selection.get_selection_iter(&fitness1).is_ok());
 
-    let individuals2 = vec![vec![true; 3]];
-    assert!(selection.get_selection_iter(&individuals2).is_ok());
+    let fitness2 = vec![1.0];
+    assert!(selection.get_selection_iter(&fitness2).is_ok());
 
-    let individuals3 = vec![vec![false; 3]];
-    assert!(selection.get_selection_iter(&individuals3).is_ok());
+    let fitness3 = vec![0.0; 3];
+    assert!(selection.get_selection_iter(&fitness3).is_ok());
 
-    let individuals4: Vec<Vec<bool>> = Vec::new();
-    assert!(selection.get_selection_iter(&individuals4).is_err());
+    let fitness4: Vec<f32> = Vec::new();
+    assert!(selection.get_selection_iter(&fitness4).is_err());
 }
