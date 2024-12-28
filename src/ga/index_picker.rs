@@ -65,7 +65,7 @@ pub struct WeightedIndexPicker {
 }
 
 impl WeightedIndexPicker {
-    fn new(weights: Vec<f64>, n_pick: usize) -> Result<Self, ()> {
+    pub fn new(weights: Vec<f64>, n_pick: usize) -> Result<Self, ()> {
         match WeightedIndex::new(weights) {
             Ok(dist) => Ok(Self { dist, n_pick }),
             _ => Err(()),

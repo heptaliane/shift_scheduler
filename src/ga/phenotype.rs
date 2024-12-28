@@ -1,10 +1,13 @@
 use super::genotype::Genotype;
 
-trait Phenotype<T>
-where
-    T: Clone,
-{
-    fn new(geno: &Genotype<T>) -> Self;
+#[cfg(test)]
+use mockall::automock;
+
+#[cfg_attr(test, automock(type GenoItem = bool;))]
+pub trait Phenotype {
+    type GenoItem;
+
+    fn new(geno: &Genotype<Self::GenoItem>) -> Self;
 
     fn fitness(&self) -> f64;
 }
