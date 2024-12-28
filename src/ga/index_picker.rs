@@ -101,10 +101,12 @@ fn test_single_index_picker() {
     let values = picker.pick();
     assert_eq!(values.len(), 1);
 
-    let samples: Vec<usize> = (0..100).map(|_| {
-        let values = picker.pick();
-        values[0]
-    }).collect();
+    let samples: Vec<usize> = (0..100)
+        .map(|_| {
+            let values = picker.pick();
+            values[0]
+        })
+        .collect();
     let max_val = samples.iter().max().unwrap().clone();
     assert!(max_val < 10);
 }
