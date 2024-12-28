@@ -3,5 +3,4 @@ pub mod fitness;
 pub mod genotype;
 pub mod index_picker;
 pub mod phenotype;
-pub mod picker;
 pub mod selection;
