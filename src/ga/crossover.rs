@@ -1,168 +1,71 @@
-use super::picker::IndexPicker;
+use super::genotype::Genotype;
+use super::index_picker::IndexPicker;
 
-pub trait Crossover {
-    fn crossover(&self, a: &Vec<bool>, b: &Vec<bool>) -> Result<(Vec<bool>, Vec<bool>), ()>;
-}
-
-pub struct OnePointCrossover<P>
+pub struct Crossover<P>
 where
     P: IndexPicker,
 {
     picker: P,
 }
 
-impl<P> Crossover for OnePointCrossover<P>
+impl<P> Crossover<P>
 where
     P: IndexPicker,
 {
-    fn crossover(&self, a: &Vec<bool>, b: &Vec<bool>) -> Result<(Vec<bool>, Vec<bool>), ()> {
-        match a.len() {
-            n if n == b.len() => {
-                let index = self.picker.pick(n)?;
-                Ok((
-                    [&a[..index], &b[index..]].concat(),
-                    [&b[..index], &a[index..]].concat(),
-                ))
-            }
-            _ => Err(()),
-        }
-    }
-}
+    pub fn crossover<T>(
+        &self,
+        a: &Genotype<T>,
+        b: &Genotype<T>,
+    ) -> Result<(Genotype<T>, Genotype<T>), ()>
+    where
+        T: Clone,
+    {
+        match a.len() == b.len() {
+            true => {
+                let indices = self.picker.pick();
+                let &i0 = indices.first().unwrap_or(&a.len());
 
-pub struct KPointCrossover<P>
-where
-    P: IndexPicker,
-{
-    k: usize,
-    picker: P,
-}
+                let mut new_a: Genotype<T> = a[0..i0].to_vec();
+                let mut new_b: Genotype<T> = b[0..i0].to_vec();
 
-impl<P> Crossover for KPointCrossover<P>
-where
-    P: IndexPicker,
-{
-    fn crossover(&self, a: &Vec<bool>, b: &Vec<bool>) -> Result<(Vec<bool>, Vec<bool>), ()> {
-        match a.len() {
-            n if n == b.len() => {
-                let indices = self.picker.pick_n(n, self.k)?;
                 let mut index_iter = indices.iter().enumerate().peekable();
-
-                let mut new_a: Vec<bool> = Vec::new();
-                let mut new_b: Vec<bool> = Vec::new();
+                let last_peek = (indices.len(), &a.len());
                 while let Some((i, &start)) = index_iter.next() {
-                    let &(_, &end) = index_iter.peek().unwrap_or(&(self.k, &n));
-                    let (target_a, target_b) = match i % 2 {
-                        0 => (&b, &a),
-                        _ => (&a, &b),
+                    let &(_, &end) = index_iter.peek().unwrap_or(&last_peek);
+                    let (frag_a, frag_b) = match i % 2 {
+                        0 => (&b[start..end], &a[start..end]),
+                        _ => (&a[start..end], &b[start..end]),
                     };
-                    new_a.extend_from_slice(&target_a[start..end]);
-                    new_b.extend_from_slice(&target_b[start..end]);
+                    new_a.extend_from_slice(frag_a);
+                    new_b.extend_from_slice(frag_b);
                 }
 
                 Ok((new_a, new_b))
             }
-            _ => Err(()),
-        }
-    }
-}
-
-pub struct UniformCrossover<P>
-where
-    P: IndexPicker,
-{
-    picker: P,
-}
-impl<P> Crossover for UniformCrossover<P>
-where
-    P: IndexPicker,
-{
-    fn crossover(&self, a: &Vec<bool>, b: &Vec<bool>) -> Result<(Vec<bool>, Vec<bool>), ()> {
-        match a.len() {
-            n if n == b.len() => {
-                let indices = self.picker.pick_some(n)?;
-                let n_crossover = indices.len();
-                let mut index_iter = indices.iter().enumerate().peekable();
-
-                let mut new_a: Vec<bool> = Vec::new();
-                let mut new_b: Vec<bool> = Vec::new();
-                while let Some((i, &start)) = index_iter.next() {
-                    let &(_, &end) = index_iter.peek().unwrap_or(&(n_crossover, &n));
-                    let (target_a, target_b) = match i % 2 {
-                        0 => (&b, &a),
-                        _ => (&a, &b),
-                    };
-                    new_a.extend_from_slice(&target_a[start..end]);
-                    new_b.extend_from_slice(&target_b[start..end]);
-                }
-
-                Ok((new_a, new_b))
-            }
-            _ => Err(()),
+            false => Err(()),
         }
     }
 }
 
 #[test]
-fn test_one_point_crossover() {
-    use super::picker::SequentialIndexPicker;
-    let picker = SequentialIndexPicker {};
-    let crossover = OnePointCrossover { picker };
+fn test_crossover() {
+    use super::index_picker::MockIndexPicker;
 
-    let mut arr1 = vec![true; 3];
-    let arr2 = vec![false; 3];
-    let arr3 = vec![true; 1];
+    let mut picker = MockIndexPicker::new();
+    picker.expect_pick().return_const(vec![1, 3]);
 
-    let expected1 = Ok((vec![false, false, false], vec![true, true, true]));
-    let actual1 = crossover.crossover(&arr1, &arr2);
-    assert_eq!(actual1, expected1);
+    let crossover = Crossover { picker };
 
-    assert!(crossover.crossover(&arr1, &arr3).is_err());
+    let geno_a = vec![0, 2, 4, 6, 8];
+    let geno_b = vec![1, 3, 5, 7, 9];
+    let crossovered = crossover.crossover(&geno_a, &geno_b);
+    assert!(crossovered.is_ok());
 
-    // Original indivisual values change will not affect crossovered one
-    arr1[0] = false;
-    assert_eq!(actual1, expected1);
-}
+    let (geno_c, geno_d) = crossovered.unwrap();
+    assert_eq!(geno_c, vec![0, 3, 5, 6, 8]);
+    assert_eq!(geno_d, vec![1, 2, 4, 7, 9]);
 
-#[test]
-fn test_k_point_crossover() {
-    use super::picker::SequentialIndexPicker;
-
-    let arr1 = vec![true; 3];
-    let arr2 = vec![false; 3];
-    let arr3 = vec![true; 1];
-
-    let picker = SequentialIndexPicker {};
-    let crossover1 = KPointCrossover { picker, k: 2 };
-
-    let expected1 = Ok((vec![false, true, true], vec![true, false, false]));
-    let actual1 = crossover1.crossover(&arr1, &arr2);
-    assert_eq!(actual1, expected1);
-
-    assert!(crossover1.crossover(&arr1, &arr3).is_err());
-
-    let picker = SequentialIndexPicker {};
-    let crossover2 = KPointCrossover { picker, k: 5 };
-
-    assert!(crossover2.crossover(&arr1, &arr2).is_err());
-}
-
-#[test]
-fn test_uniform_crossover() {
-    use super::picker::SequentialIndexPicker;
-
-    let arr1 = vec![true; 4];
-    let arr2 = vec![false; 4];
-    let arr3 = vec![true; 1];
-
-    let picker = SequentialIndexPicker {};
-    let crossover = UniformCrossover { picker };
-
-    let expected = Ok((
-        vec![false, true, true, true],
-        vec![true, false, false, false],
-    ));
-    let actual = crossover.crossover(&arr1, &arr2);
-    assert_eq!(actual, expected);
-
-    assert!(crossover.crossover(&arr1, &arr3).is_err());
+    let geno_e = vec![0];
+    let failed_crossover = crossover.crossover(&geno_a, &geno_e);
+    assert!(failed_crossover.is_err());
 }

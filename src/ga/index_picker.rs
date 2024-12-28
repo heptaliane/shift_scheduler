@@ -3,6 +3,10 @@ use rand::prelude::Distribution;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
+#[cfg(test)]
+use mockall::automock;
+
+#[cfg_attr(test, automock)]
 pub trait IndexPicker {
     fn pick(&self) -> Vec<usize>;
 }
