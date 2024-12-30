@@ -9,6 +9,7 @@ trait CrossoverInternal {
     fn create_picker(&self, length: usize) -> Result<Self::Picker, ()>;
 }
 
+#[allow(private_bounds)]
 pub trait Crossover: CrossoverInternal {
     fn crossover<T: Clone>(
         &self,
@@ -20,7 +21,8 @@ pub trait Crossover: CrossoverInternal {
         }
 
         let picker = self.create_picker(a.len())?;
-        let indices = picker.pick();
+        let mut indices = picker.pick();
+        indices.sort();
         let &i0 = indices.first().unwrap_or(&a.len());
 
         let mut new_a: Genotype<T> = a[0..i0].to_vec();
