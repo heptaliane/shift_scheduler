@@ -7,7 +7,7 @@ use super::index_picker::{IndexPicker, WeightedIndexPicker};
 
 #[cfg_attr(test, automock)]
 pub trait Selection {
-    fn select(&mut self) -> (usize, usize);
+    fn select(&self) -> (usize, usize);
 }
 
 pub struct WeightedSelection {
@@ -22,7 +22,7 @@ impl WeightedSelection {
 }
 
 impl Selection for WeightedSelection {
-    fn select(&mut self) -> (usize, usize) {
+    fn select(&self) -> (usize, usize) {
         let indices = self.picker.pick();
         (indices[0], indices[1])
     }
@@ -130,7 +130,7 @@ fn test_roulette_wheel_selection() {
     let factory = RouletteWheelSelection::new(fitness);
     let result = factory.build(&genos);
     assert!(result.is_ok());
-    let mut selection = result.unwrap();
+    let selection = result.unwrap();
     let (i1, i2) = selection.select();
     assert!(i1 < 3 && i2 < 3);
 }
@@ -147,7 +147,7 @@ fn test_rank_selection() {
     let factory = RankSelection::new(fitness, probability);
     let result = factory.build(&genos);
     assert!(result.is_ok());
-    let mut selection = result.unwrap();
+    let selection = result.unwrap();
     let (i1, i2) = selection.select();
     assert!(i1 < 3 && i2 < 3);
 }
