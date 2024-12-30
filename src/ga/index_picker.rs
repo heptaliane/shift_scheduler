@@ -65,7 +65,7 @@ pub struct WeightedIndexPicker {
 }
 
 impl WeightedIndexPicker {
-    pub fn new(weights: Vec<f64>, n_pick: usize) -> Result<Self, ()> {
+    pub fn new(weights: &Vec<f64>, n_pick: usize) -> Result<Self, ()> {
         match WeightedIndex::new(weights) {
             Ok(dist) => Ok(Self { dist, n_pick }),
             _ => Err(()),
@@ -159,12 +159,12 @@ fn test_multiple_index_picker() {
 
 #[test]
 fn test_weighted_index_picker() {
-    let invalid_picker1 = WeightedIndexPicker::new(vec![0.0, 0.0], 10);
+    let invalid_picker1 = WeightedIndexPicker::new(&vec![0.0, 0.0], 10);
     assert!(invalid_picker1.is_err());
-    let invalid_picker2 = WeightedIndexPicker::new(vec![-1.0, 0.0], 10);
+    let invalid_picker2 = WeightedIndexPicker::new(&vec![-1.0, 0.0], 10);
     assert!(invalid_picker2.is_err());
 
-    let valid_picker = WeightedIndexPicker::new(vec![0.0, 1.0, 2.0], 10);
+    let valid_picker = WeightedIndexPicker::new(&vec![0.0, 1.0, 2.0], 10);
     assert!(valid_picker.is_ok());
     let picker = valid_picker.unwrap();
     let values = picker.pick();
