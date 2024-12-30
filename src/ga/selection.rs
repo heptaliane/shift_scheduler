@@ -1,5 +1,3 @@
-use std::rc::Rc;
-
 use super::fitness::Fitness;
 use super::genotype::Genotype;
 use super::index_picker::{IndexPicker, WeightedIndexPicker};
@@ -37,15 +35,15 @@ pub struct RouletteWheelSelection<F>
 where
     F: Fitness,
 {
-    fitness: Rc<F>,
+    fitness: F,
 }
 
 impl<F> RouletteWheelSelection<F>
 where
     F: Fitness,
 {
-    pub fn new(fitness: Rc<F>) -> Self {
-        Self { fitness }
+    pub fn new(fitness: F) -> Self {
+        Self { fitness: fitness }
     }
 }
 
@@ -59,7 +57,7 @@ where
     fn build(&self, genos: &Vec<Genotype<Self::Chromosome>>) -> Result<Self::Selection, ()> {
         let fitness: Vec<f64> = genos
             .iter()
-            .map(|geno| self.fitness.as_ref().fitness(geno))
+            .map(|geno| self.fitness.fitness(geno))
             .collect();
         Self::Selection::new(&fitness)
     }
@@ -70,7 +68,7 @@ where
     F: Fitness,
     P: Fn(usize) -> f64,
 {
-    fitness: Rc<F>,
+    fitness: F,
     probability: P,
 }
 
@@ -79,7 +77,7 @@ where
     F: Fitness,
     P: Fn(usize) -> f64,
 {
-    fn new(fitness: Rc<F>, probability: P) -> Self {
+    fn new(fitness: F, probability: P) -> Self {
         Self {
             fitness,
             probability,
@@ -99,7 +97,7 @@ where
         let mut indexed_fitness: Vec<(usize, f64)> = genos
             .iter()
             .enumerate()
-            .map(|(i, geno)| (i, self.fitness.as_ref().fitness(geno)))
+            .map(|(i, geno)| (i, self.fitness.fitness(geno)))
             .collect();
         indexed_fitness.sort_by(|&(_, a), &(_, b)| a.partial_cmp(&b).unwrap());
         let mut indexed_rank: Vec<(usize, usize)> = indexed_fitness
@@ -118,13 +116,13 @@ where
 
 #[test]
 fn test_roulette_wheel_selection() {
-    use super::fitness::MockFitness;
+    use super::fitness::MockConcreteFitness as MockFitness;
 
     let genos = vec![vec![0, 3, 6], vec![1, 4, 7], vec![2, 5, 8]];
     let mut fitness = MockFitness::new();
     fitness.expect_fitness().return_const(1.0);
 
-    let factory = RouletteWheelSelection::new(Rc::new(fitness));
+    let factory = RouletteWheelSelection::new(fitness);
     let result = factory.build(&genos);
     assert!(result.is_ok());
     let selection = result.unwrap();
@@ -134,14 +132,14 @@ fn test_roulette_wheel_selection() {
 
 #[test]
 fn test_rank_selection() {
-    use super::fitness::MockFitness;
+    use super::fitness::MockConcreteFitness as MockFitness;
 
     let genos = vec![vec![0, 3, 6], vec![1, 4, 7], vec![2, 5, 8]];
     let mut fitness = MockFitness::new();
     fitness.expect_fitness().return_const(1.0);
     let probability = |x: usize| x as f64;
 
-    let factory = RankSelection::new(Rc::new(fitness), probability);
+    let factory = RankSelection::new(fitness, probability);
     let result = factory.build(&genos);
     assert!(result.is_ok());
     let selection = result.unwrap();
