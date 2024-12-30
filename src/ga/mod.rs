@@ -1,3 +1,4 @@
+pub mod algorithm;
 pub mod crossover;
 pub mod fitness;
 pub mod genotype;

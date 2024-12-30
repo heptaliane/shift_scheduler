@@ -3,6 +3,10 @@ use std::marker::PhantomData;
 use super::genotype::Genotype;
 use super::index_picker::{IndexPicker, MultipleIndexPicker, RandomSizeIndexPicker};
 
+#[cfg(test)]
+use mockall::automock;
+
+#[cfg_attr(test, automock(type Chromosome = usize;))]
 pub trait Mutation {
     type Chromosome: Clone;
 

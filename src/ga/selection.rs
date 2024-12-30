@@ -1,7 +1,11 @@
+#[cfg(test)]
+use mockall::automock;
+
 use super::fitness::Fitness;
 use super::genotype::Genotype;
 use super::index_picker::{IndexPicker, WeightedIndexPicker};
 
+#[cfg_attr(test, automock)]
 pub trait Selection {
     fn select(&self) -> (usize, usize);
 }
@@ -24,6 +28,7 @@ impl Selection for WeightedSelection {
     }
 }
 
+#[cfg_attr(test, automock(type Selection = MockSelection; type Chromosome = usize;))]
 pub trait SelectionFactory {
     type Selection: Selection;
     type Chromosome: Clone;
