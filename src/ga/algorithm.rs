@@ -1,9 +1,9 @@
-use super::crossover::{self, Crossover};
+use super::crossover::Crossover;
 use super::fitness::Fitness;
 use super::genotype::Genotype;
 use super::index_picker::{IndexPicker, RandomSizeIndexPicker};
 use super::mutation::Mutation;
-use super::selection::{self, Selection, SelectionFactory};
+use super::selection::{Selection, SelectionFactory};
 
 pub trait Algorithm {
     type Chromosome: Clone;
