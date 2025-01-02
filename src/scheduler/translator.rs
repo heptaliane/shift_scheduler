@@ -1,7 +1,5 @@
-use std::collections::HashMap;
-
 use super::schedule::Schedule;
-use crate::{ga::genotype::Genotype, scheduler::translator};
+use crate::ga::genotype::Genotype;
 
 pub struct PhenotypeTranslator {
     n_users: usize,
@@ -19,12 +17,11 @@ impl PhenotypeTranslator {
 
         let mut schedule: Schedule = Schedule::new();
         for (i, &chromosome) in geno.iter().enumerate() {
-            let user_id = i % self.n_users;
-            if user_id == 0 {
-                schedule.push(HashMap::new());
+            if i % self.n_users == 0 {
+                schedule.push(Vec::new());
             }
             let shift = schedule.last_mut().unwrap();
-            shift.insert(user_id, chromosome);
+            shift.push(chromosome);
         }
         Ok(schedule)
     }
@@ -32,13 +29,10 @@ impl PhenotypeTranslator {
     pub fn to_genotype(&self, schedule: &Schedule) -> Result<Genotype<usize>, ()> {
         let mut geno = Genotype::<usize>::new();
         for shift in schedule {
-            for user_id in 0..self.n_users {
-                if let Some(&worktype) = shift.get(&user_id) {
-                    geno.push(worktype);
-                } else {
-                    return Err(());
-                }
+            if shift.len() != self.n_users {
+                return Err(());
             }
+            geno.extend(shift);
         }
         Ok(geno)
     }
@@ -53,10 +47,7 @@ fn test_translate_to_schedule() {
     assert!(result.is_ok());
 
     let actual = result.unwrap();
-    let expected = vec![
-        HashMap::from([(0, 0), (1, 1), (2, 2)]),
-        HashMap::from([(0, 3), (1, 4), (2, 5)]),
-    ];
+    let expected = vec![vec![0, 1, 2], vec![3, 4, 5]];
     assert_eq!(actual, expected);
 
     assert!(translator.to_schedule(&vec![0, 1, 2, 3]).is_err());
@@ -66,10 +57,7 @@ fn test_translate_to_schedule() {
 fn test_translate_to_genotype() {
     let translator = PhenotypeTranslator::new(3);
 
-    let schedule: Schedule = vec![
-        HashMap::from([(0, 0), (1, 1), (2, 2)]),
-        HashMap::from([(0, 3), (1, 4), (2, 5)]),
-    ];
+    let schedule: Schedule = vec![vec![0, 1, 2], vec![3, 4, 5]];
     let result = translator.to_genotype(&schedule);
     assert!(result.is_ok());
 
@@ -77,9 +65,6 @@ fn test_translate_to_genotype() {
     let expected: Genotype<usize> = vec![0, 1, 2, 3, 4, 5];
     assert_eq!(actual, expected);
 
-    let invalid_schedule: Schedule = vec![
-        HashMap::from([(0, 0), (1, 1), (2, 2)]),
-        HashMap::from([(0, 3), (1, 4)]),
-    ];
+    let invalid_schedule: Schedule = vec![vec![0, 1, 2], vec![3, 4]];
     assert!(translator.to_genotype(&invalid_schedule).is_err());
 }
