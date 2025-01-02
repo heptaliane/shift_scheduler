@@ -10,13 +10,13 @@ pub struct GaussianScorer {
 
 impl Scorer for GaussianScorer {
     fn score(&self, x: f64) -> f64 {
-        let exponent = -(x - self.mu).powf(2.0) / (2.0 * self.sigma * self.sigma);
+        let exponent = -(x - self.mu).powi(2) / (2.0 * self.sigma.powi(2));
         exponent.exp() * self.max_score
     }
 }
 
 impl GaussianScorer {
-    fn new(target: f64, hwhm: f64, max_score: f64) -> Self {
+    pub fn new(target: f64, hwhm: f64, max_score: f64) -> Self {
         Self {
             mu: target,
             sigma: hwhm / (2.0 * 2.0f64.ln()).sqrt(),
