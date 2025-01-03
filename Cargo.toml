@@ -9,3 +9,7 @@ edition = "2021"
 mockall = "0.13.1"
 rand = "0.8.5"
 rand_distr = "0.4.3"
+
+[dependencies.yew]
+version = "0.21.0"
+features = ["csr"]

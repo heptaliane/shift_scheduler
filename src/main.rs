@@ -1,5 +1,9 @@
+use yew::Renderer;
+
+mod app;
 mod ga;
+mod scheduler;
 
 fn main() {
-    println!("Hello, world!");
+    Renderer::<app::App>::new().render();
 }
