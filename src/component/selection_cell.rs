@@ -4,12 +4,20 @@ use web_sys::HtmlSelectElement;
 use yew::prelude::use_node_ref;
 use yew::{function_component, html, Callback, Html, Properties};
 
+const DEFAULT_WIDTH: usize = 60;
+const DEFAULT_HEIGHT: usize = 60;
+
 #[derive(Properties, PartialEq)]
 pub struct SelectionCellProps {
     pub selection: Rc<Vec<String>>,
 
     #[prop_or(0)]
     pub initial_selected: usize,
+
+    #[prop_or(DEFAULT_WIDTH)]
+    pub width: usize,
+    #[prop_or(DEFAULT_HEIGHT)]
+    pub height: usize,
 
     pub on_change: Callback<usize>,
 }
@@ -31,6 +39,13 @@ pub fn SelectionCell(props: &SelectionCellProps) -> Html {
     html! {
         <select
             class="form-select"
+            style={
+                format!(
+                    "max-width: {:?}px; max-height: {:?}px",
+                    props.width,
+                    props.height,
+                )
+            }
             onchange={handle_change}
             ref={selection_ref}
         >
