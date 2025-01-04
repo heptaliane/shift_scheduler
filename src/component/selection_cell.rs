@@ -1,0 +1,51 @@
+use std::rc::Rc;
+
+use web_sys::HtmlSelectElement;
+use yew::prelude::use_node_ref;
+use yew::{function_component, html, Callback, Html, Properties};
+
+#[derive(Properties, PartialEq)]
+pub struct SelectionCellProps {
+    pub selection: Rc<Vec<String>>,
+
+    #[prop_or(0)]
+    pub initial_selected: usize,
+
+    pub on_change: Callback<usize>,
+}
+
+#[function_component]
+pub fn SelectionCell(props: &SelectionCellProps) -> Html {
+    let selection_ref = use_node_ref();
+    let handle_change = {
+        let selection_ref = selection_ref.clone();
+        let on_change = props.on_change.clone();
+        Callback::from(move |_| {
+            let input = selection_ref.cast::<HtmlSelectElement>();
+            if let Some(input) = input {
+                on_change.emit(input.value().parse().unwrap());
+            }
+        })
+    };
+
+    html! {
+        <select
+            class="form-select"
+            onchange={handle_change}
+            ref={selection_ref}
+        >
+            {
+                props.selection.iter().enumerate().map(|(i, label)| {
+                    html!{
+                        <option
+                            value={i.to_string()}
+                            selected={i == props.initial_selected}
+                        >
+                            {label}
+                        </option>
+                    }
+                }).collect::<Html>()
+            }
+        </select>
+    }
+}
