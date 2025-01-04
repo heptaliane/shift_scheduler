@@ -2,10 +2,11 @@ use std::rc::Rc;
 
 use web_sys::HtmlSelectElement;
 use yew::prelude::use_node_ref;
-use yew::{function_component, html, Callback, Html, Properties};
+use yew::{function_component, html, AttrValue, Callback, Html, Properties};
 
 const DEFAULT_WIDTH: usize = 60;
 const DEFAULT_HEIGHT: usize = 60;
+const DEFAULT_COLOR: &str = "white";
 
 #[derive(Properties, PartialEq)]
 pub struct SelectionCellProps {
@@ -18,6 +19,9 @@ pub struct SelectionCellProps {
     pub width: usize,
     #[prop_or(DEFAULT_HEIGHT)]
     pub height: usize,
+
+    #[prop_or(AttrValue::from(DEFAULT_COLOR))]
+    pub color: AttrValue,
 
     pub on_change: Callback<usize>,
 }
@@ -41,9 +45,10 @@ pub fn SelectionCell(props: &SelectionCellProps) -> Html {
             class="form-select"
             style={
                 format!(
-                    "max-width: {:?}px; max-height: {:?}px",
+                    "max-width: {:?}px; max-height: {:?}px; background-color: {}",
                     props.width,
                     props.height,
+                    props.color,
                 )
             }
             onchange={handle_change}
