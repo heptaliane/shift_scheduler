@@ -2,7 +2,7 @@ use std::rc::Rc;
 
 use web_sys::HtmlSelectElement;
 use yew::prelude::use_node_ref;
-use yew::{function_component, html, AttrValue, Callback, Html, Properties};
+use yew::{function_component, html, use_state, AttrValue, Callback, Html, Properties};
 
 const DEFAULT_WIDTH: usize = 60;
 const DEFAULT_HEIGHT: usize = 60;
@@ -22,18 +22,17 @@ pub struct SelectionCellProps {
     #[prop_or(DEFAULT_HEIGHT)]
     pub height: usize,
 
-    #[prop_or(AttrValue::from(DEFAULT_COLOR))]
-    pub color: AttrValue,
-
     pub on_change: Callback<Option<usize>>,
 }
 
 #[function_component]
 pub fn SelectionCell(props: &SelectionCellProps) -> Html {
+    let color = use_state(|| DEFAULT_COLOR);
     let selection_ref = use_node_ref();
     let handle_change = {
         let selection_ref = selection_ref.clone();
         let on_change = props.on_change.clone();
+
         Callback::from(move |_| {
             let input = selection_ref.cast::<HtmlSelectElement>();
             if let Some(input) = input {
@@ -53,7 +52,7 @@ pub fn SelectionCell(props: &SelectionCellProps) -> Html {
                     "max-width: {:?}px; max-height: {:?}px; background-color: {}",
                     props.width,
                     props.height,
-                    props.color,
+                    *color,
                 )
             }
             onchange={handle_change}
