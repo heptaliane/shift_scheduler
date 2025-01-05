@@ -14,16 +14,16 @@ const UNSELECTED_LABEL: &str = "-";
 pub struct SelectionCellProps {
     pub selection: Rc<Vec<String>>,
 
-    #[prop_or(0)]
-    pub initial_selected: usize,
+    #[prop_or(None)]
+    pub selected: Option<usize>,
 
     #[prop_or(DEFAULT_WIDTH)]
     pub width: usize,
     #[prop_or(DEFAULT_HEIGHT)]
     pub height: usize,
 
-    #[prop_or(AttrValue::from(DEFAULT_COLOR))]
-    pub color: AttrValue,
+    #[prop_or(None)]
+    pub color: Option<AttrValue>,
 
     pub on_change: Callback<Option<usize>>,
 }
@@ -45,6 +45,11 @@ pub fn SelectionCell(props: &SelectionCellProps) -> Html {
         })
     };
 
+    let color = props
+        .color
+        .clone()
+        .unwrap_or(AttrValue::from(DEFAULT_COLOR));
+
     html! {
         <select
             class="form-select"
@@ -53,19 +58,24 @@ pub fn SelectionCell(props: &SelectionCellProps) -> Html {
                     "max-width: {:?}px; max-height: {:?}px; background-color: {}",
                     props.width,
                     props.height,
-                    props.color,
+                    color,
                 )
             }
             onchange={handle_change}
             ref={selection_ref}
         >
-            <option value="">{UNSELECTED_LABEL}</option>
+            <option
+                value=""
+                selected={props.selected == None}
+            >
+                {UNSELECTED_LABEL}
+            </option>
             {
                 props.selection.iter().enumerate().map(|(i, label)| {
                     html!{
                         <option
                             value={i.to_string()}
-                            selected={i == props.initial_selected}
+                            selected={props.selected == Some(i)}
                         >
                             {label}
                         </option>

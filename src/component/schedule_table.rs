@@ -1,16 +1,17 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use yew::{function_component, html, Callback, Html, Properties};
+use yew::{function_component, html, AttrValue, Callback, Html, Properties};
 
+use super::data::WorkType;
 use super::selection_cell::SelectionCell;
 
 #[derive(Properties, PartialEq)]
 pub struct ScheduleTableProp {
-    pub psedo_schedule: Rc<HashMap<(usize, usize), usize>>,
+    pub schedule: Rc<HashMap<(usize, usize), usize>>,
     pub worker_names: Rc<Vec<String>>,
     pub date_labels: Rc<Vec<String>>,
-    pub state_map: Rc<HashMap<usize, String>>,
+    pub worktypes: Vec<WorkType>,
 
     pub on_change: Callback<(usize, usize, Option<usize>)>,
 }
@@ -18,10 +19,9 @@ pub struct ScheduleTableProp {
 #[function_component]
 pub fn ScheduleTable(props: &ScheduleTableProp) -> Html {
     let n_dates = props.date_labels.len();
-    let mut selection = props.state_map.iter().collect::<Vec<(&usize, &String)>>();
-    selection.sort_by(|(a, _), (b, _)| a.cmp(b));
-    let selection: Rc<Vec<String>> =
-        Rc::new(selection.into_iter().map(|(_, v)| v.clone()).collect());
+
+    let worktypes: Vec<Rc<WorkType>> = props.worktypes.iter().map(|w| Rc::new(w.clone())).collect();
+    let selection: Rc<Vec<String>> = Rc::new(worktypes.iter().map(|w| w.name.clone()).collect());
 
     html! {
         <table class="table">
@@ -43,13 +43,23 @@ pub fn ScheduleTable(props: &ScheduleTableProp) -> Html {
                         {
                             (0..n_dates).map(|j| {
                                 let on_change = props.on_change.clone();
-                                let handle_change = Callback::from(move |v|{
-                                    on_change.emit((i.clone(), j.clone(), v));
+                                let handle_change = Callback::from(move |v| {
+                                    on_change.emit((i, j, v));
                                 });
+                                let (selected, color) = match props.schedule.get(&(i, j)) {
+                                    Some(&v) => {
+                                        let worktype = worktypes[v].clone();
+                                        (Some(worktype.id), Some(worktype.color.clone()))
+                                    },
+                                    _ => (None, None),
+                                };
+
                                 html! {
                                     <td>
                                         <SelectionCell
                                             selection={selection.clone()}
+                                            selected={selected}
+                                            color={color}
                                             on_change={handle_change}
                                         />
                                     </td>
