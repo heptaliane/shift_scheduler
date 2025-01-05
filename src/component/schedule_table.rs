@@ -43,8 +43,8 @@ pub fn ScheduleTable(props: &ScheduleTableProp) -> Html {
                         {
                             (0..n_dates).map(|j| {
                                 let on_change = props.on_change.clone();
-                                let handle_change = Callback::from(move |v: usize|{
-                                    on_change.emit((i.clone(), j.clone(), Some(v)));
+                                let handle_change = Callback::from(move |v|{
+                                    on_change.emit((i.clone(), j.clone(), v));
                                 });
                                 html! {
                                     <td>

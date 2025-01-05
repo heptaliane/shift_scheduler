@@ -8,6 +8,8 @@ const DEFAULT_WIDTH: usize = 60;
 const DEFAULT_HEIGHT: usize = 60;
 const DEFAULT_COLOR: &str = "white";
 
+const UNSELECTED_LABEL: &str = "-";
+
 #[derive(Properties, PartialEq)]
 pub struct SelectionCellProps {
     pub selection: Rc<Vec<String>>,
@@ -23,7 +25,7 @@ pub struct SelectionCellProps {
     #[prop_or(AttrValue::from(DEFAULT_COLOR))]
     pub color: AttrValue,
 
-    pub on_change: Callback<usize>,
+    pub on_change: Callback<Option<usize>>,
 }
 
 #[function_component]
@@ -35,7 +37,10 @@ pub fn SelectionCell(props: &SelectionCellProps) -> Html {
         Callback::from(move |_| {
             let input = selection_ref.cast::<HtmlSelectElement>();
             if let Some(input) = input {
-                on_change.emit(input.value().parse().unwrap());
+                on_change.emit(match input.value().parse() {
+                    Ok(v) => Some(v),
+                    _ => None,
+                });
             }
         })
     };
@@ -54,6 +59,7 @@ pub fn SelectionCell(props: &SelectionCellProps) -> Html {
             onchange={handle_change}
             ref={selection_ref}
         >
+            <option value="">{UNSELECTED_LABEL}</option>
             {
                 props.selection.iter().enumerate().map(|(i, label)| {
                     html!{
