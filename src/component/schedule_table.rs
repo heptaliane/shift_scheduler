@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::rc::Rc;
 
-use yew::{function_component, html, AttrValue, Callback, Html, Properties};
+use yew::{function_component, html, Callback, Html, Properties};
 
 use super::data::WorkType;
 use super::selection_cell::SelectionCell;
