@@ -4,8 +4,6 @@ use web_sys::HtmlSelectElement;
 use yew::prelude::use_node_ref;
 use yew::{function_component, html, AttrValue, Callback, Html, Properties};
 
-const DEFAULT_WIDTH: usize = 60;
-const DEFAULT_HEIGHT: usize = 60;
 const DEFAULT_COLOR: &str = "white";
 
 const UNSELECTED_LABEL: &str = "-";
@@ -16,11 +14,6 @@ pub struct SelectionCellProps {
 
     #[prop_or(None)]
     pub selected: Option<usize>,
-
-    #[prop_or(DEFAULT_WIDTH)]
-    pub width: usize,
-    #[prop_or(DEFAULT_HEIGHT)]
-    pub height: usize,
 
     #[prop_or(None)]
     pub color: Option<AttrValue>,
@@ -53,14 +46,7 @@ pub fn SelectionCell(props: &SelectionCellProps) -> Html {
     html! {
         <select
             class="form-select"
-            style={
-                format!(
-                    "max-width: {:?}px; max-height: {:?}px; background-color: {}",
-                    props.width,
-                    props.height,
-                    color,
-                )
-            }
+            style={format!("background-color: {}", color)}
             onchange={handle_change}
             ref={selection_ref}
         >
