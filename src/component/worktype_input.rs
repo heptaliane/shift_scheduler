@@ -28,6 +28,22 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
         })
     };
 
+    let handle_color_change = {
+        let worktypes = props.worktypes.clone();
+        let onchange = props.onchange.clone();
+
+        Callback::from(move |e: Event| {
+            let elem = e.target().unwrap().dyn_into::<HtmlInputElement>().unwrap();
+
+            let idx: usize = elem.name().parse().unwrap();
+            let worktype = worktypes[idx].clone();
+            let value = elem.value();
+
+            let new_worktype = WorkType::new(worktype.id, &worktype.name, &value);
+            onchange.emit((idx, new_worktype));
+        })
+    };
+
     html! {
         <table class="table">
             <thead>
@@ -52,7 +68,14 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
                                         onchange={handle_text_change.clone()}
                                     />
                                 </td>
-                                <td>{worktype.color}</td>
+                                <td>
+                                    <input
+                                        type="color"
+                                        name={i.to_string()}
+                                        value={worktype.color}
+                                        onchange={handle_color_change.clone()}
+                                    />
+                                </td>
                             </tr>
                         }
                     }).collect::<Html>()
