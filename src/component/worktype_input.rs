@@ -7,7 +7,7 @@ use super::data::WorkType;
 pub struct WorkTypeInputProps {
     pub worktypes: Vec<WorkType>,
 
-    pub onchange: Callback<(usize, WorkType)>,
+    pub onchange: Callback<Vec<WorkType>>,
 }
 
 #[function_component]
@@ -20,11 +20,9 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
             let elem = e.target().unwrap().dyn_into::<HtmlInputElement>().unwrap();
 
             let idx: usize = elem.name().parse().unwrap();
-            let worktype = worktypes[idx].clone();
-            let value = elem.value();
-
-            let new_worktype = WorkType::new(worktype.id, &value, &worktype.color);
-            onchange.emit((idx, new_worktype));
+            let mut worktypes = worktypes.clone();
+            worktypes[idx].name = elem.value();
+            onchange.emit(worktypes);
         })
     };
 
@@ -36,11 +34,9 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
             let elem = e.target().unwrap().dyn_into::<HtmlInputElement>().unwrap();
 
             let idx: usize = elem.name().parse().unwrap();
-            let worktype = worktypes[idx].clone();
-            let value = elem.value();
-
-            let new_worktype = WorkType::new(worktype.id, &worktype.name, &value);
-            onchange.emit((idx, new_worktype));
+            let mut worktypes = worktypes.clone();
+            worktypes[idx].color = elem.value();
+            onchange.emit(worktypes);
         })
     };
 
