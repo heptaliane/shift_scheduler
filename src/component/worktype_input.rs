@@ -1,7 +1,10 @@
 use web_sys::{wasm_bindgen::JsCast, HtmlInputElement};
-use yew::{function_component, html, Callback, Event, Html, Properties};
+use yew::{function_component, html, Callback, Event, Html, MouseEvent, Properties};
 
 use super::data::WorkType;
+
+const DEFAULT_WORKTYPE_NAME: &str = "";
+const DEFAULT_WORKTYPE_COLOR: &str = "#ffffff";
 
 #[derive(Properties, PartialEq)]
 pub struct WorkTypeInputProps {
@@ -36,6 +39,21 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
             let idx: usize = elem.name().parse().unwrap();
             let mut worktypes = worktypes.clone();
             worktypes[idx].color = elem.value();
+            onchange.emit(worktypes);
+        })
+    };
+
+    let handle_worktype_add = {
+        let worktypes = props.worktypes.clone();
+        let onchange = props.onchange.clone();
+
+        Callback::from(move |_: MouseEvent| {
+            let mut worktypes = worktypes.clone();
+            worktypes.push(WorkType::new(
+                worktypes.len(),
+                DEFAULT_WORKTYPE_NAME,
+                DEFAULT_WORKTYPE_COLOR,
+            ));
             onchange.emit(worktypes);
         })
     };
@@ -76,6 +94,19 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
                         }
                     }).collect::<Html>()
                 }
+                <tr>
+                    <td colspan="3">
+                        <div class="d-grid">
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                onclick={handle_worktype_add.clone()}
+                            >
+                                {"+"}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
     }
