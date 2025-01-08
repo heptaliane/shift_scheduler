@@ -1,4 +1,5 @@
-use web_sys::{wasm_bindgen::JsCast, HtmlInputElement};
+use web_sys::wasm_bindgen::JsCast;
+use web_sys::{HtmlButtonElement, HtmlInputElement};
 use yew::{function_component, html, Callback, Event, Html, MouseEvent, Properties};
 
 use super::data::WorkType;
@@ -43,6 +44,20 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
         })
     };
 
+    let handle_worktype_remove = {
+        let worktypes = props.worktypes.clone();
+        let onchange = props.onchange.clone();
+
+        Callback::from(move |e: MouseEvent| {
+            let elem = e.target().unwrap().dyn_into::<HtmlButtonElement>().unwrap();
+
+            let idx: usize = elem.name().parse().unwrap();
+            let mut worktypes = worktypes.clone();
+            worktypes.remove(idx);
+            onchange.emit(worktypes);
+        })
+    };
+
     let handle_worktype_add = {
         let worktypes = props.worktypes.clone();
         let onchange = props.onchange.clone();
@@ -65,6 +80,7 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
                     <th scope="col">{"#"}</th>
                     <th scope="col">{"Name"}</th>
                     <th scope="col">{"Color"}</th>
+                    <th scope="col" />
                 </tr>
             </thead>
             <tbody>
@@ -90,12 +106,22 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
                                         onchange={handle_color_change.clone()}
                                     />
                                 </td>
+                                <td>
+                                    <button
+                                        type="button"
+                                        name={i.to_string()}
+                                        class="btn btn-primary"
+                                        onclick={handle_worktype_remove.clone()}
+                                    >
+                                        {"remove"}
+                                    </button>
+                                </td>
                             </tr>
                         }
                     }).collect::<Html>()
                 }
                 <tr>
-                    <td colspan="3">
+                    <td colspan="4">
                         <div class="d-grid">
                             <button
                                 type="button"
