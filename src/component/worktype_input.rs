@@ -93,6 +93,7 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
                                 <td>
                                     <input
                                         type="text"
+                                        class="form-control"
                                         name={i.to_string()}
                                         value={worktype.name}
                                         onchange={handle_text_change.clone()}
@@ -101,6 +102,7 @@ pub fn WorkTypeInput(props: &WorkTypeInputProps) -> Html {
                                 <td>
                                     <input
                                         type="color"
+                                        class="form-control"
                                         name={i.to_string()}
                                         value={worktype.color}
                                         onchange={handle_color_change.clone()}

@@ -33,6 +33,7 @@ pub fn DateRangeInput(props: &DateRangeInputProps) -> Html {
                 <td>
                     <input
                         type="date"
+                        class="form-control"
                         ref={from_ref}
                         value={props.date_from.clone()}
                         onchange={handle_change.clone()}
@@ -44,6 +45,7 @@ pub fn DateRangeInput(props: &DateRangeInputProps) -> Html {
                 <td>
                     <input
                         type="date"
+                        class="form-control"
                         ref={to_ref}
                         value={props.date_to.clone()}
                         onchange={handle_change.clone()}
