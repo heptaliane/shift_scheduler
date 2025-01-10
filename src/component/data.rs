@@ -16,3 +16,20 @@ impl WorkType {
         }
     }
 }
+
+#[derive(Properties, PartialEq, Clone)]
+pub struct UserConfig {
+    pub id: usize,
+    pub name: String,
+    pub tags: Vec<usize>,
+}
+
+impl UserConfig {
+    pub fn new(id: usize, name: &str, tags: Vec<usize>) -> Self {
+        Self {
+            id,
+            name: name.to_string(),
+            tags,
+        }
+    }
+}
