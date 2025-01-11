@@ -1,6 +1,6 @@
-use web_sys::HtmlInputElement;
 use web_sys::wasm_bindgen::JsCast;
-use yew::{function_component, html, Html, Properties, Event, Callback};
+use web_sys::HtmlInputElement;
+use yew::{function_component, html, Callback, Event, Html, Properties};
 
 use super::data::UserTag;
 
