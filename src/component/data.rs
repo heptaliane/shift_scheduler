@@ -18,6 +18,18 @@ impl WorkType {
 }
 
 #[derive(Properties, PartialEq, Clone)]
+pub struct UserTag {
+    pub id: usize,
+    pub label: String,
+}
+
+impl UserTag {
+    pub fn new(id: usize, label: &str) -> Self {
+        Self { id, label: label.to_string() }
+    }
+}
+
+#[derive(Properties, PartialEq, Clone)]
 pub struct UserConfig {
     pub id: usize,
     pub name: String,
