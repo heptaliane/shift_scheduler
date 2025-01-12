@@ -1,5 +1,5 @@
 use web_sys::wasm_bindgen::JsCast;
-use web_sys::{HtmlInputElement, HtmlButtonElement};
+use web_sys::{HtmlButtonElement, HtmlInputElement};
 use yew::{function_component, html, Callback, Event, Html, MouseEvent, Properties};
 
 use super::data::UserTag;
@@ -33,6 +33,20 @@ pub fn UserTagInput(props: &UserTagInputProps) -> Html {
             let idx: usize = elem.name().parse().unwrap();
             let mut tags = tags.clone();
             tags.remove(idx);
+            onchange.emit(tags);
+        })
+    };
+    let handle_add = {
+        let tags = props.tags.clone();
+        let onchange = props.onchange.clone();
+
+        Callback::from(move |e: MouseEvent| {
+            let mut tags = tags.clone();
+            let id = match tags.last() {
+                Some(tag) => tag.id + 1,
+                _ => 0,
+            };
+            tags.push(UserTag::new(id, ""));
             onchange.emit(tags);
         })
     };
@@ -73,6 +87,19 @@ pub fn UserTagInput(props: &UserTagInputProps) -> Html {
                         </tr>
                     }).collect::<Html>()
                 }
+                <tr>
+                    <td colspan="3">
+                        <div class="d-grid">
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                onclick={handle_add.clone()}
+                            >
+                                {"+"}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
             </tbody>
         </table>
     }
