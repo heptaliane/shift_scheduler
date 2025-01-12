@@ -1,6 +1,6 @@
 use web_sys::wasm_bindgen::JsCast;
-use web_sys::HtmlInputElement;
-use yew::{function_component, html, Callback, Event, Html, Properties};
+use web_sys::{HtmlInputElement, HtmlButtonElement};
+use yew::{function_component, html, Callback, Event, Html, MouseEvent, Properties};
 
 use super::data::UserTag;
 
@@ -24,6 +24,18 @@ pub fn UserTagInput(props: &UserTagInputProps) -> Html {
             onchange.emit(tags);
         })
     };
+    let handle_remove = {
+        let tags = props.tags.clone();
+        let onchange = props.onchange.clone();
+
+        Callback::from(move |e: MouseEvent| {
+            let elem = e.target().unwrap().dyn_into::<HtmlButtonElement>().unwrap();
+            let idx: usize = elem.name().parse().unwrap();
+            let mut tags = tags.clone();
+            tags.remove(idx);
+            onchange.emit(tags);
+        })
+    };
 
     html! {
         <table class="table">
@@ -31,6 +43,7 @@ pub fn UserTagInput(props: &UserTagInputProps) -> Html {
                 <tr>
                     <th scope="col">{"#"}</th>
                     <th scope="col">{"Tag"}</th>
+                    <th scope="col"></th>
                 </tr>
             </thead>
             <tbody>
@@ -46,6 +59,16 @@ pub fn UserTagInput(props: &UserTagInputProps) -> Html {
                                     value={t.label.clone()}
                                     onchange={handle_change.clone()}
                                 />
+                            </td>
+                            <td>
+                                <button
+                                    type="button"
+                                    name={i.to_string()}
+                                    class="btn btn-primary"
+                                    onclick={handle_remove.clone()}
+                                >
+                                    {"Remove"}
+                                </button>
                             </td>
                         </tr>
                     }).collect::<Html>()
