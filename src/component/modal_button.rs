@@ -30,7 +30,7 @@ pub fn ModalButton(props: &ModalButtonProps) -> Html {
             </button>
             if *visible {
                 <div
-                    class="modal fade show"
+                    class="modal show"
                     style="display: block;"
                 >
                     <div class="modal-dialog">
@@ -59,6 +59,7 @@ pub fn ModalButton(props: &ModalButtonProps) -> Html {
                         </div>
                     </div>
                 </div>
+                <div class="modal-backdrop show" />
             }
         </div>
     }
