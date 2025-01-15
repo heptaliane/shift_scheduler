@@ -6,6 +6,7 @@ use yew::{
 pub struct ModalButtonProps {
     pub children: Html,
     pub text: AttrValue,
+    pub title: AttrValue,
 }
 
 #[function_component]
@@ -34,13 +35,22 @@ pub fn ModalButton(props: &ModalButtonProps) -> Html {
                 >
                     <div class="modal-dialog">
                         <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5">
+                                    {props.title.clone()}
+                                </h1>
+                                <button
+                                    class="btn-close"
+                                    onclick={onclick.clone()}
+                                />
+                            </div>
                             <div class="modal-body">
                                 {props.children.clone()}
                             </div>
                             <div class="modal-footer">
                                 <button
                                     type="button"
-                                    class="btn btn-primary"
+                                    class="btn btn-secondary"
                                     onclick={onclick.clone()}
                                 >
                                     {"Close"}
