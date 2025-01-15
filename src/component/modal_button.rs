@@ -27,27 +27,29 @@ pub fn ModalButton(props: &ModalButtonProps) -> Html {
             >
                 {props.text.clone()}
             </button>
-            <div
-                class="modal fade"
-                show={visible.to_string()}
-            >
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            {props.children.clone()}
-                        </div>
-                        <div class="modal-footer">
-                            <button
-                                type="button"
-                                class="btn btn-primary"
-                                onclick={onclick.clone()}
-                            >
-                                {"Close"}
-                            </button>
+            if *visible {
+                <div
+                    class="modal fade show"
+                    style="display: block;"
+                >
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-body">
+                                {props.children.clone()}
+                            </div>
+                            <div class="modal-footer">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    onclick={onclick.clone()}
+                                >
+                                    {"Close"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            }
         </div>
     }
 }
