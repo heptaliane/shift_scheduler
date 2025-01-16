@@ -7,15 +7,25 @@ pub struct ModalButtonProps {
     pub children: Html,
     pub text: AttrValue,
     pub title: AttrValue,
+
+    pub onsubmit: Callback<()>,
 }
 
 #[function_component]
 pub fn ModalButton(props: &ModalButtonProps) -> Html {
     let visible = use_state_eq(|| false);
-    let onclick = {
+    let handle_toggle = {
         let visible = visible.clone();
         Callback::from(move |_: MouseEvent| {
             visible.set(!*visible);
+        })
+    };
+    let handle_submit = {
+        let visible = visible.clone();
+        let onsubmit = props.onsubmit.clone();
+        Callback::from(move |_: MouseEvent| {
+            visible.set(false);
+            onsubmit.emit(());
         })
     };
 
@@ -24,7 +34,7 @@ pub fn ModalButton(props: &ModalButtonProps) -> Html {
             <button
                 type="button"
                 class="btn btn-primary"
-                onclick={onclick.clone()}
+                onclick={handle_toggle.clone()}
             >
                 {props.text.clone()}
             </button>
@@ -41,7 +51,7 @@ pub fn ModalButton(props: &ModalButtonProps) -> Html {
                                 </h1>
                                 <button
                                     class="btn-close"
-                                    onclick={onclick.clone()}
+                                    onclick={handle_toggle.clone()}
                                 />
                             </div>
                             <div class="modal-body">
@@ -51,9 +61,16 @@ pub fn ModalButton(props: &ModalButtonProps) -> Html {
                                 <button
                                     type="button"
                                     class="btn btn-secondary"
-                                    onclick={onclick.clone()}
+                                    onclick={handle_toggle.clone()}
                                 >
                                     {"Close"}
+                                </button>
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    onclick={handle_submit.clone()}
+                                >
+                                    {"Submit"}
                                 </button>
                             </div>
                         </div>
