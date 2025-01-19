@@ -44,19 +44,21 @@ fn selection_cell(
 #[function_component]
 pub fn ScheduleTable(props: &ScheduleTableProp) -> Html {
     let selection: Vec<AttrValue> = props.worktypes.iter().map(|w| w.name.clone()).collect();
-    let selection_lut: Rc<HashMap<usize, usize>> = Rc::new(
-        props
-            .worktypes
-            .iter()
-            .enumerate()
-            .map(|(i, w)| (i, w.id))
-            .collect(),
-    );
+    let selection_lut: HashMap<Option<usize>, usize> = props
+        .worktypes
+        .iter()
+        .enumerate()
+        .map(|(i, w)| (Some(i), w.id))
+        .collect();
     let mut headers = vec![AttrValue::from("#")];
     headers.extend(props.col_labels.clone());
     let handle_change = {
         let schedule = props.schedule.clone();
-        Callback::from(move |(user_id, col_id, value): (usize, usize, Option<usize>)| {})
+        Callback::from(
+            move |(user_id, col_id, value): (usize, usize, Option<usize>)| {
+                let mut schedule = schedule.clone();
+            },
+        )
     };
 
     let cells = props
@@ -70,10 +72,12 @@ pub fn ScheduleTable(props: &ScheduleTableProp) -> Html {
                     .iter()
                     .enumerate()
                     .map(|(i, _)| {
+                        let worktype_id = props.schedule.get(&(user.id, i)).cloned();
+                        let selected = selection_lut.get(&worktype_id);
                         selection_cell(
                             user.clone(),
                             i,
-                            props.schedule.get(&(user.id, i)).copied(),
+                            selected.copied(),
                             selection.clone(),
                             handle_change.clone(),
                         )
