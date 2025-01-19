@@ -1,3 +1,3 @@
 pub mod components;
-pub mod features;
 mod data;
+pub mod features;
