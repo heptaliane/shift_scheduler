@@ -54,9 +54,16 @@ pub fn ScheduleTable(props: &ScheduleTableProp) -> Html {
     headers.extend(props.col_labels.clone());
     let handle_change = {
         let schedule = props.schedule.clone();
+        let onchange = props.onchange.clone();
         Callback::from(
             move |(user_id, col_id, value): (usize, usize, Option<usize>)| {
                 let mut schedule = schedule.clone();
+                if let Some(v) = value {
+                    schedule.insert((user_id, col_id), v);
+                } else {
+                    schedule.remove(&(user_id, col_id));
+                }
+                onchange.emit(schedule);
             },
         )
     };
