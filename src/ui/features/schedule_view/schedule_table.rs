@@ -7,7 +7,7 @@ use crate::ui::components::select::Select;
 use crate::ui::components::table::Table;
 use crate::ui::data::{UserConfig, WorkType};
 
-type ScheduleMap = HashMap<(usize, usize), usize>;
+pub type ScheduleMap = HashMap<(usize, usize), usize>;
 
 #[derive(Properties, PartialEq)]
 pub struct ScheduleTableProp {
