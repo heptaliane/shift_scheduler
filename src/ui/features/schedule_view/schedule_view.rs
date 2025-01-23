@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use yew::{function_component, html, use_state_eq, AttrValue, Callback, Html, Properties};
+use yew::{function_component, html, use_state_eq, AttrValue, Callback, Html, MouseEvent, Properties};
 
 use super::schedule_table::{ScheduleMap, ScheduleTable};
 use crate::ui::data::{UserConfig, WorkType};
@@ -17,7 +17,12 @@ pub struct ScheduleViewProp {
 #[function_component]
 pub fn ScheduleView(props: &ScheduleViewProp) -> Html {
     let schedule = use_state_eq(|| ScheduleMap::new());
-    let handle_change = { Callback::from(move |schedule: ScheduleMap| {}) };
+    let handle_change = {
+        let schedule = schedule.clone();
+        Callback::from(move |new_schedule: ScheduleMap| {
+            schedule.set(new_schedule);
+        })
+    };
     html! {
         <div class="card">
             <div class="card-body">
