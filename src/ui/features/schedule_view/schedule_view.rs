@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
-use yew::{function_component, html, use_state_eq, AttrValue, Callback, Html, MouseEvent, Properties};
+use yew::{
+    function_component, html, use_state_eq, AttrValue, Callback, Html, MouseEvent, Properties,
+};
 
 use super::schedule_table::{ScheduleMap, ScheduleTable};
 use crate::ui::data::{UserConfig, WorkType};
@@ -23,6 +25,24 @@ pub fn ScheduleView(props: &ScheduleViewProp) -> Html {
             schedule.set(new_schedule);
         })
     };
+    let handle_submit = {
+        let schedule = schedule.clone();
+        let onsubmit = props.onsubmit.clone();
+        let users = props.users.clone();
+        let n_cols = props.col_labels.len();
+        Callback::from(move |_: MouseEvent| {
+            onsubmit.emit(
+                users
+                    .iter()
+                    .map(|user| {
+                        (0..n_cols)
+                            .map(|i| schedule.get(&(user.id, i)).cloned())
+                            .collect()
+                    })
+                    .collect(),
+            );
+        })
+    };
     html! {
         <div class="card">
             <div class="card-body">
@@ -35,6 +55,14 @@ pub fn ScheduleView(props: &ScheduleViewProp) -> Html {
                 />
             </div>
             <div class="card-footer">
+                <div class="d-grid">
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                    >
+                        {"Submit"}
+                    </button>
+                </div>
             </div>
         </div>
     }
