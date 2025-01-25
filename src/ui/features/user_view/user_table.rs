@@ -14,7 +14,11 @@ pub struct UserTableProps {
 
 #[function_component]
 pub fn UserTable(props: &UserTableProps) -> Html {
-    let elems: Vec<Vec<Html>> = props.users.iter().map(|user| vec![html! {user.id}]).collect();
+    let elems: Vec<Vec<Html>> = props
+        .users
+        .iter()
+        .map(|user| vec![html! {user.id}])
+        .collect();
     let headers: Vec<AttrValue> = HEADERS.iter().map(|h| AttrValue::from(h.clone())).collect();
     html! {
         <Table
