@@ -1,15 +1,17 @@
 use std::collections::HashSet;
 
-use yew::{function_component, html, AttrValue, Html, Properties};
+use yew::{function_component, html, AttrValue, Callback, Html, MouseEvent, Properties};
 
 use crate::ui::components::table::Table;
 use crate::ui::data::UserConfig;
 
-const HEADERS: [&str; 2] = ["#", "name"];
+const HEADERS: [&str; 3] = ["#", "name", "edit"];
 
 #[derive(Properties, PartialEq)]
 pub struct UserTableProps {
     pub users: Vec<UserConfig>,
+
+    pub onedit: Callback<usize>,
 }
 
 #[function_component]
@@ -17,9 +19,29 @@ pub fn UserTable(props: &UserTableProps) -> Html {
     let elems: Vec<Vec<Html>> = props
         .users
         .iter()
-        .map(|user| vec![html! {user.id}])
+        .enumerate()
+        .map(|(i, user)| {
+            vec![html! {user.id}, html! {user.name.clone()}, {
+                let onedit = props.onedit.clone();
+                html! {
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        onclick={Callback::from(move |_: MouseEvent| {
+                            onedit.emit(i);
+                        })}
+                    >
+                    {"Edit"}
+                    </button>
+                }
+            }]
+        })
         .collect();
-    let headers: Vec<AttrValue> = HEADERS.iter().map(|h| AttrValue::from(h.clone())).collect();
+
+    let headers: Vec<AttrValue> = HEADERS
+        .iter()
+        .map(|h| AttrValue::from(h.to_string()))
+        .collect();
     html! {
         <Table
             headers={headers}
