@@ -12,6 +12,7 @@ pub struct UserTableProps {
     pub users: Vec<UserConfig>,
 
     pub onedit: Callback<usize>,
+    pub onadd: Callback<()>,
 }
 
 #[function_component]
@@ -37,16 +38,30 @@ pub fn UserTable(props: &UserTableProps) -> Html {
             }]
         })
         .collect();
-
     let headers: Vec<AttrValue> = HEADERS
         .iter()
         .map(|h| AttrValue::from(h.to_string()))
         .collect();
+
     html! {
-        <Table
-            headers={headers}
-            cell_elements={elems}
-            primary_column={HashSet::from_iter([0])}
-        />
+        <div class="d-grid gap-2">
+            <Table
+                headers={headers}
+                cell_elements={elems}
+                primary_column={HashSet::from_iter([0])}
+            />
+            <button
+                type="button"
+                class="btn btn-primary"
+                onclick={
+                    let onadd = props.onadd.clone();
+                    Callback::from(move |_: MouseEvent| {
+                        onadd.emit(());
+                    })
+                }
+            >
+                {"+"}
+            </button>
+        </div>
     }
 }
