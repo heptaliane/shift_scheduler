@@ -38,13 +38,15 @@ pub fn UserView(props: &UserViewProps) -> Html {
         let onchange = props.onchange.clone();
         Callback::from(move |user: UserConfig| {
             let idx = (*current_user).clone().unwrap();
-            let mut users = (*users).clone();
+            let mut new_users = (*users).clone();
             if users.len() > idx {
-                users[idx] = user;
+                new_users[idx] = user;
             } else {
-                users.push(user);
+                new_users.push(user);
             }
-            onchange.emit(users);
+            users.set(new_users);
+            current_user.set(None);
+            onchange.emit((*users).clone());
         })
     };
     let new_user = {
@@ -65,7 +67,7 @@ pub fn UserView(props: &UserViewProps) -> Html {
         <div>
             <Card>
                 <UserTable
-                    users={props.users.clone()}
+                    users={(*users).clone()}
                     onedit={handle_edit}
                     onadd={handle_add}
                 />
