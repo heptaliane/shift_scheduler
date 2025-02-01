@@ -7,7 +7,7 @@ use crate::ui::data::UserConfig;
 
 #[derive(Properties, PartialEq)]
 pub struct UserEditFormProps {
-    pub id: usize,
+    pub user: UserConfig,
 
     pub oncancel: Callback<()>,
     pub onsubmit: Callback<UserConfig>,
@@ -15,16 +15,12 @@ pub struct UserEditFormProps {
 
 #[function_component]
 pub fn UserEditForm(props: &UserEditFormProps) -> Html {
-    let name = use_state_eq(|| AttrValue::from(""));
+    let user = use_state_eq(|| props.user.clone());
     let onsubmit = {
-        let id = props.id;
-        let name = name.clone();
+        let user = user.clone();
         let onsubmit = props.onsubmit.clone();
         Callback::from(move |_| {
-            onsubmit.emit(UserConfig {
-                id,
-                name: (*name).clone(),
-            });
+            onsubmit.emit((*user).clone());
         })
     };
     let oncancel = {
@@ -34,10 +30,13 @@ pub fn UserEditForm(props: &UserEditFormProps) -> Html {
         })
     };
     let onchange = {
-        let name = name.clone();
+        let user = user.clone();
         Callback::from(move |e: Event| {
             let input = e.target().unwrap().dyn_into::<HtmlInputElement>().unwrap();
-            name.set(AttrValue::from(input.value()));
+            user.set(UserConfig {
+                id: user.id,
+                name: AttrValue::from(input.value()),
+            });
         })
     };
 
@@ -52,7 +51,7 @@ pub fn UserEditForm(props: &UserEditFormProps) -> Html {
             <input
                 type="text"
                 class="form-control"
-                value={(*name).clone()}
+                value={user.name.clone()}
                 onchange={onchange.clone()}
             />
         </FormContainer>
