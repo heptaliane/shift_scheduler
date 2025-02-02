@@ -1,7 +1,5 @@
 use yew::{function_component, html, AttrValue, Callback, Html, MouseEvent, Properties};
 
-use crate::ui::components::card::Card;
-
 #[derive(Properties, PartialEq)]
 pub struct FormContainerProps {
     #[prop_or(None)]
@@ -29,41 +27,43 @@ pub fn FormContainer(props: &FormContainerProps) -> Html {
     };
 
     html! {
-        <Card
-            header={
-                html! {
-                    <div>
-                        <h5 class="card-title">{props.header.clone()}</h5>
-                        <button
-                            type="button"
-                            class="btn-close"
-                            onclick={handle_cancel.clone()}
-                        />
+        <div>
+            <div class="modal show" style="display: block;">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title">
+                                {props.header.clone()}
+                            </h1>
+                            <button
+                                type="button"
+                                class="btn-close"
+                                onclick={handle_cancel.clone()}
+                            />
+                        </div>
+                        <div class="modal-body">
+                            {props.children.clone()}
+                        </div>
+                        <div class="modal-footer">
+                            <button
+                                type="button"
+                                class="btn btn-secondary"
+                                onclick={handle_cancel.clone()}
+                            >
+                                {"Close"}
+                            </button>
+                            <button
+                                type="button"
+                                class="btn btn-primary"
+                                onclick={handle_submit.clone()}
+                            >
+                                {"Submit"}
+                            </button>
+                        </div>
                     </div>
-                }
-            }
-            footer={
-                html! {
-                    <div>
-                        <button
-                            type="button"
-                            class="btn btn-secondary"
-                            onclick={handle_cancel.clone()}
-                        >
-                            {"Close"}
-                        </button>
-                        <button
-                            type="button"
-                            class="btn btn-primary"
-                            onclick={handle_submit.clone()}
-                        >
-                            {"Submit"}
-                        </button>
-                    </div>
-                }
-            }
-        >
-            {props.children.clone()}
-        </Card>
+                </div>
+            </div>
+            <div class="modal-backdrop show" />
+        </div>
     }
 }
