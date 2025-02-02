@@ -70,14 +70,14 @@ pub fn UserView(props: &UserViewProps) -> Html {
                     onedit={handle_edit}
                     onadd={handle_add}
                 />
-                if let Some(idx) = (*current_user).clone() {
-                    <UserEditForm
-                        user={props.users.get(idx).cloned().unwrap_or(new_user())}
-                        oncancel={handle_close}
-                        onsubmit={handle_submit}
-                    />
-                }
             </Card>
+            if let Some(idx) = (*current_user).clone() {
+                <UserEditForm
+                    user={users.get(idx).cloned().unwrap_or(new_user())}
+                    oncancel={handle_close}
+                    onsubmit={handle_submit}
+                />
+            }
         </div>
     }
 }
