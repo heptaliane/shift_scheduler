@@ -4,7 +4,6 @@ use super::user_edit_form::UserEditForm;
 use super::user_table::UserTable;
 use crate::ui::components::card::Card;
 use crate::ui::data::UserConfig;
-use log::info;
 
 #[derive(Properties, PartialEq)]
 pub struct UserViewProps {
@@ -50,7 +49,7 @@ pub fn UserView(props: &UserViewProps) -> Html {
         })
     };
     let new_user = {
-        let users = props.users.clone();
+        let users = users.clone();
         move || match users.last() {
             Some(user) => UserConfig {
                 id: user.id + 1,
