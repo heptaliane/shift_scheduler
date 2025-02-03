@@ -1,6 +1,8 @@
 use std::collections::HashSet;
 
-use yew::{function_component, html, use_state_eq, AttrValue, Html, Properties};
+use web_sys::wasm_bindgen::JsCast;
+use web_sys::HtmlInputElement;
+use yew::{function_component, html, use_state_eq, AttrValue, Callback, Event, Html, Properties};
 
 use crate::ui::components::table::Table;
 
@@ -16,6 +18,17 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
     let row_idx = use_state_eq(|| None::<usize>);
     let row_item = use_state_eq(|| props.default.clone());
     let data = use_state_eq(|| props.data.clone());
+
+    let handle_change = {
+        let row_item = row_item.clone();
+        Callback::from(move |e: Event| {
+            let input = e.target().unwrap().dyn_into::<HtmlInputElement>().unwrap();
+            let idx: usize = input.name().parse().unwrap();
+            let mut new_item = (*row_item).clone();
+            new_item[idx] = AttrValue::from(input.value());
+            row_item.set(new_item);
+        })
+    };
 
     let elems: Vec<Vec<Html>> = data
         .iter()
@@ -40,7 +53,9 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
                                     <input
                                         type="text"
                                         class="form-control"
+                                        name={i.to_string()}
                                         value={(*row_item)[i].clone()}
+                                        onchange={handle_change.clone()}
                                     />
                                 </div>
                             }
