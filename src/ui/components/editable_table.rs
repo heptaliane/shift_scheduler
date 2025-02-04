@@ -1,8 +1,11 @@
 use std::collections::HashSet;
 
 use web_sys::wasm_bindgen::JsCast;
-use web_sys::HtmlInputElement;
-use yew::{function_component, html, use_state_eq, AttrValue, Callback, Event, Html, Properties};
+use web_sys::{HtmlButtonElement, HtmlInputElement};
+use yew::{
+    function_component, html, use_state_eq, AttrValue, Callback, Event, Html, MouseEvent,
+    Properties,
+};
 
 use crate::ui::components::table::Table;
 
@@ -19,6 +22,18 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
     let row_item = use_state_eq(|| props.default.clone());
     let data = use_state_eq(|| props.data.clone());
 
+    let handle_edit = {
+        let row_idx = row_idx.clone();
+        let row_item = row_item.clone();
+        let data = data.clone();
+        Callback::from(move |e: MouseEvent| {
+            let btn = e.target().unwrap().dyn_into::<HtmlButtonElement>().unwrap();
+            let idx: usize = btn.name().parse().unwrap();
+            row_idx.set(Some(idx));
+            let (_, item) = data[idx].clone();
+            row_item.set(item);
+        })
+    };
     let handle_change = {
         let row_item = row_item.clone();
         Callback::from(move |e: Event| {
@@ -32,7 +47,24 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
 
     let elems: Vec<Vec<Html>> = data
         .iter()
-        .map(|(_, items)| items.iter().map(|item| html! { item }).collect())
+        .enumerate()
+        .map(|(i, (_, items))| {
+            vec![
+                vec![html! {"#"}],
+                items.iter().map(|item| html! {item}).collect(),
+                vec![html! {
+                    <button
+                        type="button"
+                        name={i.to_string()}
+                        class="btn btn-primary"
+                        onclick={handle_edit.clone()}
+                    >
+                        {"Edit"}
+                    </button>
+                }],
+            ]
+            .concat()
+        })
         .collect();
 
     html! {
