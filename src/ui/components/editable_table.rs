@@ -7,6 +7,7 @@ use yew::{
     Properties,
 };
 
+use crate::ui::components::form_container::FormContainer;
 use crate::ui::components::table::Table;
 
 #[derive(Properties, PartialEq)]
@@ -44,6 +45,29 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
             row_item.set(new_item);
         })
     };
+    let handle_close = {
+        let row_idx = row_idx.clone();
+        Callback::from(move |_: ()| row_idx.set(None))
+    };
+    let handle_submit = {
+        let row_idx = row_idx.clone();
+        let row_item = row_item.clone();
+        let data = data.clone();
+        Callback::from(move |_: ()| {
+            let idx = (*row_idx).clone().unwrap();
+            let mut new_data = (*data).clone();
+            if new_data.len() > idx {
+                new_data[idx].1 = (*row_item).clone();
+            } else {
+                let id = match new_data.last() {
+                    Some(&(i, _)) => i,
+                    _ => 0,
+                };
+                new_data.push((id, (*row_item).clone()));
+            }
+            data.set(new_data);
+        })
+    };
 
     let elems: Vec<Vec<Html>> = data
         .iter()
@@ -78,7 +102,10 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
                     {
                         (0..N).map(|i| {
                             html! {
-                                <div>
+                                <FormContainer
+                                    oncancel={handle_close.clone()}
+                                    onsubmit={handle_submit.clone()}
+                                >
                                     <label class="form-label">
                                         {props.headers[i].clone()}
                                     </label>
@@ -89,7 +116,7 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
                                         value={(*row_item)[i].clone()}
                                         onchange={handle_change.clone()}
                                     />
-                                </div>
+                                </FormContainer>
                             }
                         }).collect::<Html>()
                     }
