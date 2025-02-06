@@ -15,6 +15,8 @@ pub struct EditableTableProps<const N: usize> {
     pub data: Vec<(usize, [AttrValue; N])>,
     pub headers: [AttrValue; N],
     pub default: [AttrValue; N],
+
+    pub onchange: Callback<Vec<(usize, [AttrValue; N])>>,
 }
 
 #[function_component]
@@ -35,6 +37,16 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
             row_item.set(item);
         })
     };
+    let handle_add = {
+        let row_idx = row_idx.clone();
+        let row_item = row_item.clone();
+        let default_item = props.default.clone();
+        let data = data.clone();
+        Callback::from(move |_: MouseEvent| {
+            row_idx.set(Some(data.len()));
+            row_item.set(default_item.clone());
+        })
+    };
     let handle_change = {
         let row_item = row_item.clone();
         Callback::from(move |e: Event| {
@@ -53,6 +65,7 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
         let row_idx = row_idx.clone();
         let row_item = row_item.clone();
         let data = data.clone();
+        let onchange = props.onchange.clone();
         Callback::from(move |_: ()| {
             let idx = (*row_idx).clone().unwrap();
             let mut new_data = (*data).clone();
@@ -65,6 +78,7 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
                 };
                 new_data.push((id, (*row_item).clone()));
             }
+            onchange.emit(new_data.clone());
             data.set(new_data);
         })
     };
@@ -98,29 +112,38 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
                 cell_elements={elems}
                 primary_column={HashSet::from_iter([0])}
             />
-                if let Some(idx) = (*row_idx).clone() {
-                    {
-                        (0..N).map(|i| {
-                            html! {
-                                <FormContainer
-                                    oncancel={handle_close.clone()}
-                                    onsubmit={handle_submit.clone()}
-                                >
-                                    <label class="form-label">
-                                        {props.headers[i].clone()}
-                                    </label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        name={i.to_string()}
-                                        value={(*row_item)[i].clone()}
-                                        onchange={handle_change.clone()}
-                                    />
-                                </FormContainer>
-                            }
-                        }).collect::<Html>()
-                    }
+            <div class="id-grid">
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    onclick={handle_add}
+                >
+                    {"+"}
+                </button>
+            </div>
+            if row_idx.is_some() {
+                {
+                    (0..N).map(|i| {
+                        html! {
+                            <FormContainer
+                                oncancel={handle_close.clone()}
+                                onsubmit={handle_submit.clone()}
+                            >
+                                <label class="form-label">
+                                    {props.headers[i].clone()}
+                                </label>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    name={i.to_string()}
+                                    value={(*row_item)[i].clone()}
+                                    onchange={handle_change.clone()}
+                                />
+                            </FormContainer>
+                        }
+                    }).collect::<Html>()
                 }
+            }
         </div>
     }
 }
