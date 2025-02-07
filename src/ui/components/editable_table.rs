@@ -86,9 +86,9 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
     let elems: Vec<Vec<Html>> = data
         .iter()
         .enumerate()
-        .map(|(i, (_, items))| {
+        .map(|(i, (id, items))| {
             vec![
-                vec![html! {"#"}],
+                vec![html! {id.to_string()}],
                 items.iter().map(|item| html! {item}).collect(),
                 vec![html! {
                     <button
@@ -104,11 +104,12 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
             .concat()
         })
         .collect();
+    let headers: Vec<AttrValue> = vec![vec![AttrValue::from("#")], props.headers.to_vec()].concat();
 
     html! {
         <div>
             <Table
-                headers={props.headers.to_vec()}
+                headers={headers}
                 cell_elements={elems}
                 primary_column={HashSet::from_iter([0])}
             />
