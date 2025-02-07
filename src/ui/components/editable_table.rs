@@ -105,7 +105,12 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
             .concat()
         })
         .collect();
-    let headers: Vec<AttrValue> = vec![vec![AttrValue::from("#")], props.headers.to_vec()].concat();
+    let headers: Vec<AttrValue> = vec![
+        vec![AttrValue::from("#")],
+        props.headers.to_vec(),
+        vec![AttrValue::from("Edit")],
+    ]
+    .concat();
 
     html! {
         <div>
@@ -114,7 +119,7 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
                 cell_elements={elems}
                 primary_column={HashSet::from_iter([0])}
             />
-            <div class="id-grid">
+            <div class="d-grid">
                 <button
                     type="button"
                     class="btn btn-primary"
