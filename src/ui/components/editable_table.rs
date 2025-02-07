@@ -73,13 +73,14 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
                 new_data[idx].1 = (*row_item).clone();
             } else {
                 let id = match new_data.last() {
-                    Some(&(i, _)) => i,
+                    Some(&(i, _)) => i + 1,
                     _ => 0,
                 };
                 new_data.push((id, (*row_item).clone()));
             }
             onchange.emit(new_data.clone());
             data.set(new_data);
+            row_idx.set(None);
         })
     };
 
