@@ -12,3 +12,9 @@ pub struct UserConfig {
     pub id: usize,
     pub name: AttrValue,
 }
+
+#[derive(Properties, PartialEq, Clone)]
+pub struct UserTag {
+    pub id: usize,
+    pub label: AttrValue,
+}
