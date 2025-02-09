@@ -11,6 +11,7 @@ pub struct WorkType {
 pub struct UserConfig {
     pub id: usize,
     pub name: AttrValue,
+    pub tags: Vec<usize>,
 }
 
 #[derive(Properties, PartialEq, Clone)]

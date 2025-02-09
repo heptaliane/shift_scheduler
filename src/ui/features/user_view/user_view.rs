@@ -21,6 +21,7 @@ pub fn UserView(props: &UserViewProps) -> Html {
                     .map(|(id, arr)| UserConfig {
                         id: id.clone(),
                         name: arr[0].clone(),
+                        tags: Vec::new(),
                     })
                     .collect(),
             );
