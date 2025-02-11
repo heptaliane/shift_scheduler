@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::HtmlButtonElement;
@@ -7,7 +7,7 @@ use yew::{
 };
 
 use crate::ui::components::form_container::FormContainer;
-use crate::ui::components::table::Table;
+use crate::ui::components::select::Select;
 use crate::ui::data::UserTag;
 
 #[derive(Properties, PartialEq)]
@@ -52,6 +52,16 @@ pub fn TagPicker(props: &TagPickerProps) -> Html {
             onsubmit.emit(data.iter().map(|id| tags_lut[id].clone()).collect());
         })
     };
+    let handle_add = {
+        let data = data.clone();
+        Callback::from(move |idx: Option<usize>| {
+            if let Some(i) = idx {
+                let mut new_data = (*data).clone();
+                new_data.push(i);
+                data.set(new_data);
+            }
+        })
+    };
 
     html! {
         <div>
@@ -66,36 +76,53 @@ pub fn TagPicker(props: &TagPickerProps) -> Html {
                 oncancel={handle_hide.clone()}
                 onsubmit={handle_submit.clone()}
             >
-                <Table
-                    headers={vec![AttrValue::from("Tag name")]}
-                    cell_elements={
-                        data
-                            .iter()
-                            .enumerate()
-                            .map(|(i, id)| vec![
-                                html! {tags_lut[id].label.clone()},
-                                html! {
-                                    <button
-                                        type="button"
-                                        class="btn btn-primary"
-                                        name={i.to_string()}
-                                        onclick={handle_delete.clone()}
-                                    >
-                                        {"Delete"}
-                                    </button>
-                                },
-                            ]).collect::<Vec<Vec<Html>>>()
-                    }
-                    primary_column={HashSet::new()}
-                />
-                <div class="d-grid">
-                    <button
-                        type="button"
-                        class="btn btn-primary"
-                    >
-                        {"+"}
-                    </button>
-                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col">{"Label"}</th>
+                            <th scope="col">{"Edit"}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            data.iter().enumerate().map(|(i, id)| html! {
+                                <tr>
+                                    <td>
+                                        {tags_lut[id].label.clone()}
+                                    </td>
+                                    <td>
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary"
+                                            name={i.to_string()}
+                                            onclick={handle_delete.clone()}
+                                        >
+                                            {"Delete"}
+                                        </button>
+                                    </td>
+                                </tr>
+                            }).collect::<Html>()
+                        }
+                        <tr>
+                            <td>
+                                <Select
+                                    selection={
+                                        let data = data.clone();
+                                        props
+                                            .tags
+                                            .iter()
+                                            .filter_map(move |tag| match data.contains(&tag.id) {
+                                                true => Some(tag.label.clone()),
+                                                _ => None,
+                                            }).collect::<Vec<AttrValue>>()
+                                    }
+                                    onchange={handle_add.clone()}
+                                />
+                            </td>
+                            <td/>
+                        </tr>
+                    </tbody>
+                </table>
             </FormContainer>
         </div>
     }
