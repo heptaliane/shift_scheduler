@@ -1,10 +1,9 @@
 use web_sys::wasm_bindgen::JsCast;
-use web_sys::HtmlButtonElement;
+use web_sys::{HtmlButtonElement, HtmlInputElement};
 use yew::{
-    function_component, html, use_state_eq, AttrValue, Callback, Html, MouseEvent, Properties,
+    function_component, html, use_state_eq, AttrValue, Callback, Event, Html, MouseEvent, Properties
 };
 
-use crate::ui::components::select::Select;
 use crate::ui::data::{UserConfig, UserTag};
 
 #[derive(Properties, PartialEq)]
@@ -36,6 +35,15 @@ pub fn UserEditForm(props: &UserEditFormProps) -> Html {
             user.set(new_user);
         })
     };
+    let handle_name_change = {
+        let user = user.clone();
+        Callback::from(move |e: Event| {
+            let mut new_user = (*user).clone();
+            let inp = e.target().unwrap().dyn_into::<HtmlInputElement>().unwrap();
+            new_user.name = AttrValue::from(inp.value());
+            user.set(new_user);
+        })
+    };
 
     html! {
         <div>
@@ -46,6 +54,7 @@ pub fn UserEditForm(props: &UserEditFormProps) -> Html {
                 type="text"
                 class="form-control"
                 value={(*user).name.clone()}
+                onchange={handle_name_change.clone()}
             />
             <label class="form-label">
                 {"Tags"}
