@@ -1,7 +1,10 @@
-use std::collections::HashMap;
+use web_sys::wasm_bindgen::JsCast;
+use web_sys::HtmlButtonElement;
+use yew::{
+    function_component, html, use_state_eq, AttrValue, Callback, Html, MouseEvent, Properties,
+};
 
-use yew::{function_component, html, use_state_eq, AttrValue, Callback, Html, Properties};
-
+use crate::ui::components::select::Select;
 use crate::ui::data::{UserConfig, UserTag};
 
 #[derive(Properties, PartialEq)]
@@ -16,6 +19,23 @@ pub struct UserEditFormProps {
 #[function_component]
 pub fn UserEditForm(props: &UserEditFormProps) -> Html {
     let user = use_state_eq(|| props.user.clone());
+    let handle_tag_change = {
+        let user = user.clone();
+        let tags = props.tags.clone();
+        Callback::from(move |e: MouseEvent| {
+            let btn = e.target().unwrap().dyn_into::<HtmlButtonElement>().unwrap();
+            let idx: usize = btn.name().parse().unwrap();
+            let tag_id = tags[idx].id;
+            let mut new_user = (*user).clone();
+
+            if let Some(i) = new_user.tags.iter().position(|&i| i == tag_id) {
+                new_user.tags.remove(i);
+            } else {
+                new_user.tags.push(tag_id);
+            }
+            user.set(new_user);
+        })
+    };
 
     html! {
         <div>
@@ -42,6 +62,7 @@ pub fn UserEditForm(props: &UserEditFormProps) -> Html {
                                 type="button"
                                 class={class_str}
                                 name={i.to_string()}
+                                onclick={handle_tag_change.clone()}
                             >
                                 {t.label.clone()}
                             </button>
