@@ -1,9 +1,11 @@
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::{HtmlButtonElement, HtmlInputElement};
 use yew::{
-    function_component, html, use_state_eq, AttrValue, Callback, Event, Html, MouseEvent, Properties
+    function_component, html, use_state_eq, AttrValue, Callback, Event, Html, MouseEvent,
+    Properties,
 };
 
+use crate::ui::components::form_container::FormContainer;
 use crate::ui::data::{UserConfig, UserTag};
 
 #[derive(Properties, PartialEq)]
@@ -44,9 +46,19 @@ pub fn UserEditForm(props: &UserEditFormProps) -> Html {
             user.set(new_user);
         })
     };
+    let handle_submit = {
+        let user = user.clone();
+        let onsubmit = props.onsubmit.clone();
+        Callback::from(move |e: ()| {
+            onsubmit.emit((*user).clone());
+        })
+    };
 
     html! {
-        <div>
+        <FormContainer
+            onsubmit={handle_submit}
+            oncancel={props.oncancel.clone()}
+        >
             <label class="form-label">
                 {"Name"}
             </label>
@@ -79,6 +91,6 @@ pub fn UserEditForm(props: &UserEditFormProps) -> Html {
                     }).collect::<Html>()
                 }
             </div>
-        </div>
+        </FormContainer>
     }
 }
