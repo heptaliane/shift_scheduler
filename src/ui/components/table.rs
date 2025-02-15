@@ -1,52 +1,96 @@
-use std::collections::HashSet;
-
-use yew::{function_component, html, AttrValue, Html, Properties};
+use yew::{function_component, functional, html, Html, Properties};
 
 #[derive(Properties, PartialEq)]
-pub struct TableProp {
-    pub headers: Vec<AttrValue>,
-    pub cell_elements: Vec<Vec<Html>>,
-
-    #[prop_or(HashSet::from([0]))]
-    pub primary_column: HashSet<usize>,
+pub struct TableProps {
+    pub children: Html,
 }
 
 #[function_component]
-pub fn Table(props: &TableProp) -> Html {
+pub fn Table(props: &TableProps) -> Html {
     html! {
         <table class="table">
-            <thead>
-                <tr>
-                {
-                    props.headers.iter().map(|label| html! {
-                        <th scope="col">
-                        {label}
-                        </th>
-                    }).collect::<Html>()
-                }
-                </tr>
-            </thead>
-            <tbody>
-            {
-                props.cell_elements.iter().map(|elems| html! {
-                    <tr>
-                    {
-                        elems.iter().enumerate().map(|(i, elem)| html! {
-                            if props.primary_column.contains(&i) {
-                                <th scope="row">
-                                {elem.clone()}
-                                </th>
-                            } else {
-                                <td>
-                                {elem.clone()}
-                                </td>
-                            }
-                        }).collect::<Html>()
-                    }
-                    </tr>
-                }).collect::<Html>()
-            }
-            </tbody>
+            {props.children.clone()}
         </table>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct TableHeaderProps {
+    pub children: Html,
+}
+
+#[function_component]
+pub fn TableHeader(props: &TableHeaderProps) -> Html {
+    html! {
+        <thead>
+            {props.children.clone()}
+        </thead>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct TableBodyProps {
+    pub children: Html,
+}
+
+#[function_component]
+pub fn TableBody(props: &TableBodyProps) -> Html {
+    html! {
+        <tbody>
+            {props.children.clone()}
+        </tbody>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct TableRowProps {
+    pub children: Html,
+}
+
+#[function_component]
+pub fn TableRow(props: &TableRowProps) -> Html {
+    html! {
+        <tr>
+            {props.children.clone()}
+        </tr>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct TableHeaderCellProps {
+    pub children: Html,
+}
+
+#[function_component]
+pub fn TableHeaderCell(props: &TableHeaderCellProps) -> Html {
+    html! {
+        <th>
+            {props.children.clone()}
+        </th>
+    }
+}
+
+#[derive(Properties, PartialEq)]
+pub struct TableCellProps {
+    pub children: Html,
+
+    #[prop_or(false)]
+    pub header: bool,
+}
+
+#[function_component]
+pub fn TableCell(props: &TableCellProps) -> Html {
+    if props.header {
+        html! {
+            <th scope="row">
+                {props.children.clone()}
+            </th>
+        }
+    } else {
+        html! {
+            <td>
+                {props.children.clone()}
+            </td>
+        }
     }
 }
