@@ -1,10 +1,11 @@
 use std::collections::{HashMap, HashSet};
-use std::rc::Rc;
 
 use yew::{function_component, html, AttrValue, Callback, Html, Properties};
 
 use crate::ui::components::select::Select;
-use crate::ui::components::table::Table;
+use crate::ui::components::table::{
+    Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow,
+};
 use crate::ui::data::{UserConfig, WorkType};
 
 pub type ScheduleMap = HashMap<(usize, usize), usize>;
@@ -96,10 +97,45 @@ pub fn ScheduleTable(props: &ScheduleTableProp) -> Html {
         .collect::<Vec<Vec<Html>>>();
 
     html! {
-        <Table
-            headers={headers}
-            cell_elements={cells}
-            primary_column={HashSet::from([0])}
-        />
+        <Table>
+            <TableHeader>
+                <TableRow>
+                    <TableHeaderCell>
+                        {"#"}
+                    </TableHeaderCell>
+                    {
+                        props.col_labels.iter().map(|label| html! {
+                            <TableHeaderCell>
+                                {label}
+                            </TableHeaderCell>
+                        }).collect::<Html>()
+                    }
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {
+                    props.users.iter().map(|user| html! {
+                        <TableRow>
+                            <TableCell>
+                                {user.name.clone()}
+                            </TableCell>
+                            {
+                                props.col_labels.iter().enumerate().map(|(i, _)| {
+                                    let worktype_id = props.schedule.get(&(user.id, i)).cloned();
+                                    let selected = selection_lut.get(&worktype_id);
+                                    selection_cell(
+                                        user.clone(),
+                                        i,
+                                        selected.copied(),
+                                        selection.clone(),
+                                        handle_change.clone()
+                                    )
+                                }).collect::<Html>()
+                            }
+                        </TableRow>
+                    }).collect::<Html>()
+                }
+            </TableBody>
+        </Table>
     }
 }
