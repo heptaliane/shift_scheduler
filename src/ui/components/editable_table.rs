@@ -8,7 +8,9 @@ use yew::{
 };
 
 use crate::ui::components::form_container::FormContainer;
-use crate::ui::components::table::Table;
+use crate::ui::components::table::{
+    Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow,
+};
 
 #[derive(Properties, PartialEq)]
 pub struct EditableTableProps<const N: usize> {
@@ -84,41 +86,47 @@ pub fn EditableTable<const N: usize>(props: &EditableTableProps<N>) -> Html {
         })
     };
 
-    let elems: Vec<Vec<Html>> = data
-        .iter()
-        .enumerate()
-        .map(|(i, (id, items))| {
-            vec![
-                vec![html! {id.to_string()}],
-                items.iter().map(|item| html! {item}).collect(),
-                vec![html! {
-                    <button
-                        type="button"
-                        name={i.to_string()}
-                        class="btn btn-primary"
-                        onclick={handle_edit.clone()}
-                    >
-                        {"Edit"}
-                    </button>
-                }],
-            ]
-            .concat()
-        })
-        .collect();
-    let headers: Vec<AttrValue> = vec![
-        vec![AttrValue::from("#")],
-        props.headers.to_vec(),
-        vec![AttrValue::from("Edit")],
-    ]
-    .concat();
-
     html! {
         <div>
-            <Table
-                headers={headers}
-                cell_elements={elems}
-                primary_column={HashSet::from_iter([0])}
-            />
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHeaderCell>{"#"}</TableHeaderCell>
+                        {
+                            props.headers.iter().map(|txt| html! {
+                                <TableHeaderCell>{txt}</TableHeaderCell>
+                            }).collect::<Html>()
+                        }
+                        <TableHeaderCell>{"Edit"}</TableHeaderCell>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                {
+                    data.iter().enumerate().map(|(i, (id, items))| html! {
+                        <TableRow>
+                            <TableCell header={true}>
+                                {id}
+                            </TableCell>
+                            {
+                                items.iter().map(|item| html! {
+                                    <TableCell>{item}</TableCell>
+                                }).collect::<Html>()
+                            }
+                            <TableCell>
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    name={i.to_string()}
+                                    onclick={handle_edit.clone()}
+                                >
+                                    {"Edit"}
+                                </button>
+                            </TableCell>
+                        </TableRow>
+                    }).collect::<Html>()
+                }
+                </TableBody>
+            </Table>
             <div class="d-grid">
                 <button
                     type="button"
