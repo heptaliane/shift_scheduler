@@ -2,7 +2,9 @@ use std::collections::HashMap;
 
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::HtmlButtonElement;
-use yew::{function_component, html, use_state_eq, Callback, Html, MouseEvent, Properties};
+use yew::{
+    function_component, html, use_state_eq, AttrValue, Callback, Html, MouseEvent, Properties,
+};
 
 use crate::ui::components::badge::Badge;
 use crate::ui::components::card::Card;
@@ -39,13 +41,35 @@ pub fn UserView(props: &UserViewProps) -> Html {
             current_user.set(Some((idx, users[idx].clone())));
         })
     };
+    let handle_add = {
+        let current_user = current_user.clone();
+        let users = users.clone();
+        Callback::from(move |_: MouseEvent| {
+            let id = match users.last() {
+                Some(user) => user.id + 1,
+                _ => 0,
+            };
+            current_user.set(Some((
+                users.len(),
+                UserConfig {
+                    id,
+                    name: AttrValue::from(""),
+                    tags: Vec::new(),
+                },
+            )))
+        })
+    };
     let handle_submit = {
         let current_user = current_user.clone();
         let users = users.clone();
         Callback::from(move |new_user: UserConfig| {
             let (idx, _) = (*current_user).clone().unwrap();
             let mut new_users = (*users).clone();
-            new_users[idx] = new_user;
+            if new_users.len() > idx {
+                new_users[idx] = new_user;
+            } else {
+                new_users.push(new_user);
+            }
             users.set(new_users);
             current_user.set(None);
         })
