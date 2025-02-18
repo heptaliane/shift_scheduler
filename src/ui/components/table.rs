@@ -74,6 +74,9 @@ pub fn TableHeaderCell(props: &TableHeaderCellProps) -> Html {
 pub struct TableCellProps {
     pub children: Html,
 
+    #[prop_or(None)]
+    pub span: Option<usize>,
+
     #[prop_or(false)]
     pub header: bool,
 }
@@ -87,10 +90,18 @@ pub fn TableCell(props: &TableCellProps) -> Html {
             </th>
         }
     } else {
-        html! {
-            <td>
-                {props.children.clone()}
-            </td>
+        if let Some(span) = props.span {
+            html! {
+                <td colspan={span.to_string()}>
+                    {props.children.clone()}
+                </td>
+            }
+        } else {
+            html! {
+                <td>
+                    {props.children.clone()}
+                </td>
+            }
         }
     }
 }
