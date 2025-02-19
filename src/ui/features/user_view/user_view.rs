@@ -125,6 +125,19 @@ pub fn UserView(props: &UserViewProps) -> Html {
                             </TableRow>
                         }).collect::<Html>()
                     }
+                    <TableRow>
+                        <TableCell span={Some(2)}>
+                            <div class="d-grid">
+                                <button
+                                    type="button"
+                                    class="btn btn-primary"
+                                    onclick={handle_add}
+                                >
+                                    {"+"}
+                                </button>
+                            </div>
+                        </TableCell>
+                    </TableRow>
                     </TableBody>
                 </Table>
             </Card>
