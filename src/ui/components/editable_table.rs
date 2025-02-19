@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::{HtmlButtonElement, HtmlInputElement};
 use yew::{
