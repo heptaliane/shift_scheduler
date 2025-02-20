@@ -1,3 +1,4 @@
+use chrono::NaiveDate;
 use yew::{AttrValue, Properties};
 
 #[derive(Properties, PartialEq, Clone)]
@@ -18,4 +19,9 @@ pub struct UserConfig {
 pub struct UserTag {
     pub id: usize,
     pub label: AttrValue,
+}
+
+#[derive(Properties, PartialEq, Clone)]
+pub struct DateConfig {
+    pub date: NaiveDate,
 }
