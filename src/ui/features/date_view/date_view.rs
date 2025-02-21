@@ -1,4 +1,5 @@
-use chrono::NaiveDate;
+use chrono::{Local, NaiveDate, TimeDelta};
+use core::ops::Add;
 
 use yew::{function_component, html, use_state_eq, Callback, Html, Properties};
 
@@ -8,30 +9,42 @@ use crate::ui::data::DateConfig;
 
 #[derive(Properties, PartialEq)]
 pub struct DateViewProps {
-    pub dates: Vec<DateConfig>,
-
     pub onchange: Callback<Vec<DateConfig>>,
 }
 
 #[function_component]
 pub fn DateView(props: &DateViewProps) -> Html {
-    let dates = use_state_eq(|| props.dates.clone());
+    let dates = use_state_eq(|| {
+        vec![
+            DateConfig {
+                date: Local::now().date_naive(),
+            },
+            DateConfig {
+                date: Local::now().add(TimeDelta::days(1)).date_naive(),
+            },
+        ]
+    });
     let handle_start_change = {
+        let onchange = props.onchange.clone();
         let dates = dates.clone();
         Callback::from(move |date: NaiveDate| {
             let mut new_dates = (*dates).clone();
             new_dates[0] = DateConfig { date };
-            dates.set(new_dates)
+            dates.set(new_dates);
+            onchange.emit((*dates).clone());
         })
     };
     let handle_end_change = {
+        let onchange = props.onchange.clone();
         let dates = dates.clone();
         Callback::from(move |date: NaiveDate| {
             let mut new_dates = (*dates).clone();
             new_dates[dates.len() - 1] = DateConfig { date };
-            dates.set(new_dates)
+            dates.set(new_dates);
+            onchange.emit((*dates).clone());
         })
     };
+
     html! {
         <Card>
             <div class="row g-3 align-items-center">
