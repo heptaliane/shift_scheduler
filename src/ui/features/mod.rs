@@ -1,3 +1,5 @@
+pub mod config_view;
+pub mod date_view;
 pub mod schedule_view;
 pub mod tag_picker;
 pub mod tag_view;
