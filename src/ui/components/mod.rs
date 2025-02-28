@@ -1,3 +1,4 @@
+pub mod accordion;
 pub mod badge;
 pub mod card;
 pub mod editable_table;
