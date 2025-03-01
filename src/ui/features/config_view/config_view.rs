@@ -1,5 +1,6 @@
-use yew::{function_component, html, Callback, Html, Properties};
+use yew::{function_component, html, AttrValue, Callback, Html, Properties};
 
+use crate::ui::components::accordion::{AccordionContainer, AccordionItem};
 use crate::ui::components::card::Card;
 use crate::ui::data::{DateConfig, UserConfig, UserTag};
 use crate::ui::features::date_view::date_view::DateView;
@@ -31,19 +32,25 @@ pub fn ConfigView(props: &ConfigViewProps) -> Html {
         })
     };
     html! {
-        <Card>
-            <UserView
-                users={props.users.clone()}
-                user_tags={props.tags.clone()}
-                onchange={handle_user_change}
-            />
-            <TagView
-                tags={props.tags.clone()}
-                onchange={handle_tag_change}
-            />
-            <DateView
-                onchange={handle_date_change}
-            />
-        </Card>
+        <AccordionContainer>
+            <AccordionItem header={AttrValue::from("Users")}>
+                <UserView
+                    users={props.users.clone()}
+                    user_tags={props.tags.clone()}
+                    onchange={handle_user_change}
+                />
+            </AccordionItem>
+            <AccordionItem header={AttrValue::from("Tags")}>
+                <TagView
+                    tags={props.tags.clone()}
+                    onchange={handle_tag_change}
+                />
+            </AccordionItem>
+            <AccordionItem header={AttrValue::from("Dates")}>
+                <DateView
+                    onchange={handle_date_change}
+                />
+            </AccordionItem>
+        </AccordionContainer>
     }
 }
