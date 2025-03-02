@@ -20,11 +20,14 @@ pub fn AccordionContainer(props: &AccordionContainerProps) -> Html {
 pub struct AccordionItemProps {
     pub header: AttrValue,
     pub children: Html,
+
+    #[prop_or(true)]
+    pub initial_show: bool,
 }
 
 #[function_component]
 pub fn AccordionItem(props: &AccordionItemProps) -> Html {
-    let show = use_state_eq(|| false);
+    let show = use_state_eq(|| props.initial_show);
     let handle_show = {
         let show = show.clone();
         Callback::from(move |_: MouseEvent| show.set(true))
