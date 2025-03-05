@@ -51,7 +51,7 @@ pub fn DateView(props: &DateViewProps) -> Html {
         props
             .dates
             .iter()
-            .map(|&config| (config.date, config))
+            .map(|config| (config.date, config.clone()))
             .collect::<HashMap<NaiveDate, DateConfig>>()
     });
     let handle_start_change = {
