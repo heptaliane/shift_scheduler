@@ -1,7 +1,6 @@
 use yew::{function_component, html, AttrValue, Callback, Html, Properties};
 
 use crate::ui::components::accordion::{AccordionContainer, AccordionItem};
-use crate::ui::components::card::Card;
 use crate::ui::data::{DateConfig, UserConfig, UserTag};
 use crate::ui::features::date_view::date_view::DateView;
 use crate::ui::features::tag_view::tag_view::TagView;
@@ -12,23 +11,30 @@ pub struct ConfigViewProps {
     pub users: Vec<UserConfig>,
     pub tags: Vec<UserTag>,
     pub dates: Vec<DateConfig>,
+
+    pub on_users_change: Callback<Vec<UserConfig>>,
+    pub on_tags_change: Callback<Vec<UserTag>>,
+    pub on_dates_change: Callback<Vec<DateConfig>>,
 }
 
 #[function_component]
 pub fn ConfigView(props: &ConfigViewProps) -> Html {
     let handle_user_change = {
+        let onchange = props.on_users_change.clone();
         Callback::from(move |users: Vec<UserConfig>| {
-            // TODO: Implement Callback
+            onchange.emit(users);
         })
     };
     let handle_tag_change = {
+        let onchange = props.on_tags_change.clone();
         Callback::from(move |tags: Vec<UserTag>| {
-            // TODO: Implement Callback
+            onchange.emit(tags);
         })
     };
     let handle_date_change = {
+        let onchange = props.on_dates_change.clone();
         Callback::from(move |dates: Vec<DateConfig>| {
-            // TODO: Implement Callback
+            onchange.emit(dates);
         })
     };
     html! {
@@ -48,6 +54,7 @@ pub fn ConfigView(props: &ConfigViewProps) -> Html {
             </AccordionItem>
             <AccordionItem header={AttrValue::from("Dates")}>
                 <DateView
+                    dates={props.dates.clone()}
                     onchange={handle_date_change}
                 />
             </AccordionItem>
