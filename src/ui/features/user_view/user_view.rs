@@ -71,9 +71,9 @@ pub fn UserView(props: &UserViewProps) -> Html {
             } else {
                 new_users.push(new_user);
             }
+            onchange.emit(new_users.clone());
             users.set(new_users);
             current_user.set(None);
-            onchange.emit((*users).clone());
         })
     };
     let handle_cancel = {
