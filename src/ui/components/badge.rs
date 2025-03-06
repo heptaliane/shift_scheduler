@@ -12,7 +12,7 @@ pub struct BadgeProps {
 #[function_component]
 pub fn Badge(props: &BadgeProps) -> Html {
     html! {
-        <span class={format!("badge text-bg-{}", props.text)}>
+        <span class={format!("badge text-bg-{}", props.variant)}>
             {props.text.clone()}
         </span>
     }

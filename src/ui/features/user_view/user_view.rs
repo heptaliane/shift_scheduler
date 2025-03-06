@@ -106,10 +106,12 @@ pub fn UserView(props: &UserViewProps) -> Html {
                                     {user.name.clone()}
                                 </TableCell>
                                 <TableCell>
-                                    <div class="d-grid">
+                                    <div class="d-inline-flex">
                                     {
                                         user.tags.iter().map(|i| html! {
-                                            <Badge text={tags_lut[i].label.clone()} />
+                                            <div class="me-1">
+                                                <Badge text={tags_lut[i].label.clone()} />
+                                            </div>
                                         }).collect::<Html>()
                                     }
                                     </div>
@@ -128,7 +130,7 @@ pub fn UserView(props: &UserViewProps) -> Html {
                         }).collect::<Html>()
                     }
                     <TableRow>
-                        <TableCell span={Some(2)}>
+                        <TableCell span={Some(4)}>
                             <div class="d-grid">
                                 <button
                                     type="button"
