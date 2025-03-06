@@ -143,7 +143,7 @@ pub fn UserView(props: &UserViewProps) -> Html {
                     </TableBody>
                 </Table>
             </Card>
-            if let Some((id, user)) = (*current_user).clone() {
+            if let Some((_, user)) = (*current_user).clone() {
                 <UserEditForm
                     user={user}
                     tags={props.user_tags.clone()}
