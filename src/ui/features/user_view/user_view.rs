@@ -60,6 +60,7 @@ pub fn UserView(props: &UserViewProps) -> Html {
         })
     };
     let handle_submit = {
+        let onchange = props.onchange.clone();
         let current_user = current_user.clone();
         let users = users.clone();
         Callback::from(move |new_user: UserConfig| {
@@ -72,6 +73,7 @@ pub fn UserView(props: &UserViewProps) -> Html {
             }
             users.set(new_users);
             current_user.set(None);
+            onchange.emit((*users).clone());
         })
     };
     let handle_cancel = {
