@@ -4,6 +4,7 @@ use std::collections::HashMap;
 use chrono::{Local, NaiveDate, TimeDelta};
 
 use yew::{function_component, html, use_state_eq, Callback, Html, MouseEvent, Properties};
+use log::info;
 
 use super::date_input::DateInput;
 use crate::ui::components::card::Card;
@@ -60,7 +61,7 @@ pub fn DateView(props: &DateViewProps) -> Html {
         let dates = dates.clone();
         Callback::from(move |date: NaiveDate| {
             start_date.set(date);
-            dates.set(update_date_lut(&dates, &start_date, &end_date));
+            dates.set(update_date_lut(&dates, &date, &end_date));
         })
     };
     let handle_end_change = {
@@ -69,13 +70,14 @@ pub fn DateView(props: &DateViewProps) -> Html {
         let dates = dates.clone();
         Callback::from(move |date: NaiveDate| {
             end_date.set(date);
-            dates.set(update_date_lut(&dates, &start_date, &end_date));
+            dates.set(update_date_lut(&dates, &start_date, &date));
         })
     };
     let handle_submit = {
         let start_date = start_date.clone();
         let end_date = end_date.clone();
         let dates = dates.clone();
+        let onchange = props.onchange.clone();
         Callback::from(move |_: MouseEvent| {
             let mut current = (*start_date).clone();
             let mut configs: Vec<DateConfig> = Vec::new();
@@ -83,6 +85,7 @@ pub fn DateView(props: &DateViewProps) -> Html {
                 configs.push(dates[&current].clone());
                 current = current.add(TimeDelta::days(1));
             }
+            onchange.emit(configs);
         })
     };
 
