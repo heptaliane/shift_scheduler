@@ -7,6 +7,11 @@ use yew::{function_component, html, Callback, Event, Html, Properties};
 pub struct DateInputProps {
     pub value: NaiveDate,
 
+    #[prop_or(None)]
+    pub max: Option<NaiveDate>,
+    #[prop_or(None)]
+    pub min: Option<NaiveDate>,
+
     pub onchange: Callback<NaiveDate>,
 }
 
@@ -23,6 +28,8 @@ pub fn DateInput(props: &DateInputProps) -> Html {
         <input
             type="date"
             class="form-control"
+            max={if let Some(d) = props.max { d.to_string() } else { "".to_string() }}
+            min={if let Some(d) = props.min { d.to_string() } else { "".to_string() }}
             value={props.value.to_string()}
             onchange={handle_change}
         />

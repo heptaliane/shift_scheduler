@@ -98,6 +98,7 @@ pub fn DateView(props: &DateViewProps) -> Html {
                 <div class="col-auto">
                     <DateInput
                         value={(*start_date).clone()}
+                        max={Some(*end_date.clone())}
                         onchange={handle_start_change}
                     />
                 </div>
@@ -107,6 +108,7 @@ pub fn DateView(props: &DateViewProps) -> Html {
                 <div class="col-auto">
                     <DateInput
                         value={(*end_date).clone()}
+                        min={Some(*start_date.clone())}
                         onchange={handle_end_change}
                     />
                 </div>
