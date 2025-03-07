@@ -32,8 +32,8 @@ fn update_date_lut(
                     date: current.clone(),
                 },
             );
-            current = current.add(TimeDelta::days(1));
         }
+        current = current.add(TimeDelta::days(1));
     }
     lut
 }
