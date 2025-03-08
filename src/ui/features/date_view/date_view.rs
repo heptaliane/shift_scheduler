@@ -4,9 +4,9 @@ use std::collections::HashMap;
 use chrono::{Local, NaiveDate, TimeDelta};
 
 use yew::{function_component, html, use_state_eq, Callback, Html, MouseEvent, Properties};
-use log::info;
 
 use super::date_input::DateInput;
+use super::date_table::DateTable;
 use crate::ui::components::card::Card;
 use crate::ui::data::DateConfig;
 
@@ -36,6 +36,20 @@ fn update_date_lut(
         current = current.add(TimeDelta::days(1));
     }
     lut
+}
+
+fn get_date_configs(
+    lut: &HashMap<NaiveDate, DateConfig>,
+    start_date: &NaiveDate,
+    end_date: &NaiveDate,
+) -> Vec<DateConfig> {
+    let mut current = start_date.clone();
+    let mut dates: Vec<DateConfig> = Vec::new();
+    while current <= *end_date {
+        dates.push(lut[&current].clone());
+        current = current.add(TimeDelta::days(1));
+    }
+    dates
 }
 
 #[function_component]
@@ -79,13 +93,7 @@ pub fn DateView(props: &DateViewProps) -> Html {
         let dates = dates.clone();
         let onchange = props.onchange.clone();
         Callback::from(move |_: MouseEvent| {
-            let mut current = (*start_date).clone();
-            let mut configs: Vec<DateConfig> = Vec::new();
-            while current <= *end_date {
-                configs.push(dates[&current].clone());
-                current = current.add(TimeDelta::days(1));
-            }
-            onchange.emit(configs);
+            onchange.emit(get_date_configs(&dates, &start_date, &end_date));
         })
     };
 
@@ -122,6 +130,9 @@ pub fn DateView(props: &DateViewProps) -> Html {
                     {"Submit"}
                 </button>
             </div>
+            <DateTable
+                dates={get_date_configs(&dates, &start_date, &end_date)}
+            />
         </Card>
     }
 }
