@@ -62,13 +62,14 @@ pub fn DateView(props: &DateViewProps) -> Html {
         Some(date) => date.date,
         _ => Local::now().date_naive(),
     });
-    let dates = use_state_eq(|| {
-        props
+    let dates = {
+        let dates_lut = props
             .dates
             .iter()
             .map(|config| (config.date, config.clone()))
-            .collect::<HashMap<NaiveDate, DateConfig>>()
-    });
+            .collect::<HashMap<NaiveDate, DateConfig>>();
+        use_state_eq(|| update_date_lut(&dates_lut, &start_date, &end_date))
+    };
     let handle_start_change = {
         let start_date = start_date.clone();
         let end_date = end_date.clone();
