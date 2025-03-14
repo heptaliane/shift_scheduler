@@ -4,12 +4,12 @@ use yew::{
     function_component, html, use_state_eq, AttrValue, Callback, Html, MouseEvent, Properties,
 };
 
+use super::worktype_edit_form::WorktypeEditForm;
 use crate::ui::components::card::Card;
 use crate::ui::components::table::{
     Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow,
 };
 use crate::ui::data::WorkType;
-use super::worktype_edit_form::WorktypeEditForm;
 
 #[derive(Properties, PartialEq)]
 pub struct WorktypeViewProps {
@@ -47,6 +47,29 @@ pub fn WorktypeView(props: &WorktypeViewProps) -> Html {
                     color: AttrValue::from("white"),
                 },
             )))
+        })
+    };
+    let handle_submit = {
+        let onchange = props.onchange.clone();
+        let current_worktype = current_worktype.clone();
+        let worktypes = worktypes.clone();
+        Callback::from(move |new_worktype: WorkType| {
+            let (idx, _) = (*current_worktype).clone().unwrap();
+            let mut new_worktypes = (*worktypes).clone();
+            if new_worktypes.len() > idx {
+                new_worktypes[idx] = new_worktype;
+            } else {
+                new_worktypes.push(new_worktype);
+            }
+            onchange.emit(new_worktypes.clone());
+            worktypes.set(new_worktypes);
+            current_worktype.set(None);
+        })
+    };
+    let handle_cancel = {
+        let current_worktype = current_worktype.clone();
+        Callback::from(move |_: ()| {
+            current_worktype.set(None);
         })
     };
 
@@ -104,6 +127,13 @@ pub fn WorktypeView(props: &WorktypeViewProps) -> Html {
                     </TableBody>
                 </Table>
             </Card>
+            if let Some((_, worktype)) = (*current_worktype).clone() {
+                <WorktypeEditForm
+                    worktype={worktype}
+                    onsubmit={handle_submit}
+                    oncancel={handle_cancel}
+                />
+            }
         </div>
     }
 }
