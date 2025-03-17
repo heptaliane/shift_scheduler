@@ -1,4 +1,9 @@
-use yew::{function_component, html, use_state_eq, AttrValue, ChildrenWithProps, Html, Properties};
+use web_sys::wasm_bindgen::JsCast;
+use web_sys::HtmlAnchorElement;
+use yew::{
+    function_component, html, use_state_eq, AttrValue, Callback, ChildrenWithProps, MouseEvent, Html,
+    Properties,
+};
 
 #[derive(Properties, PartialEq)]
 pub struct NavItemProps {
@@ -30,6 +35,13 @@ pub fn Nav(props: &NavProps) -> Html {
             .collect::<Vec<AttrValue>>()
     });
     let active = use_state_eq(|| 0);
+    let handle_click = {
+        let active = active.clone();
+        Callback::from(move |e: MouseEvent| {
+            let a = e.target().unwrap().dyn_into::<HtmlAnchorElement>().unwrap();
+            active.set(a.name().parse().unwrap());
+        })
+    };
 
     html! {
         <div>
@@ -38,11 +50,19 @@ pub fn Nav(props: &NavProps) -> Html {
                 tabs.iter().enumerate().map(|(i, name)| html! {
                     <li class="nav-item">
                         if i == *active {
-                            <a class="nav-link active">
+                            <a
+                                class="nav-link active"
+                                name={i.to_string()}
+                                onclick={handle_click.clone()}
+                            >
                                 {name}
                             </a>
                         } else {
-                            <a class="nav-link">
+                            <a
+                                class="nav-link"
+                                name={i.to_string()}
+                                onclick={handle_click.clone()}
+                            >
                                 {name}
                             </a>
                         }
