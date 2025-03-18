@@ -17,23 +17,27 @@ pub fn app() -> Html {
         })
     };
     let handle_users_change = {
+        let users = users.clone();
         Callback::from(move |new_users: Vec<UserConfig>| {
-            // TODO: implement update
+            users.set(new_users);
         })
     };
     let handle_dates_change = {
+        let dates = dates.clone();
         Callback::from(move |new_dates: Vec<DateConfig>| {
-            // TODO: implement update
+            dates.set(new_dates);
         })
     };
     let handle_tags_change = {
+        let tags = tags.clone();
         Callback::from(move |new_tags: Vec<UserTag>| {
-            // TODO: implement update
+            tags.set(new_tags);
         })
     };
     let handle_worktypes_change = {
+        let worktypes = worktypes.clone();
         Callback::from(move |new_worktypes: Vec<WorkType>| {
-            // TODO: implement update
+            worktypes.set(new_worktypes);
         })
     };
 
