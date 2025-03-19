@@ -123,13 +123,19 @@ pub fn ScheduleTable(props: &ScheduleTableProp) -> Html {
                                 props.col_labels.iter().enumerate().map(|(i, _)| {
                                     let worktype_id = props.schedule.get(&(user.id, i)).cloned();
                                     let selected = selection_lut.get(&worktype_id);
-                                    selection_cell(
-                                        user.clone(),
-                                        i,
-                                        selected.copied(),
-                                        selection.clone(),
-                                        handle_change.clone()
-                                    )
+                                    html! {
+                                        <TableCell>
+                                        {
+                                            selection_cell(
+                                                user.clone(),
+                                                i,
+                                                selected.copied(),
+                                                selection.clone(),
+                                                handle_change.clone()
+                                            )
+                                        }
+                                        </TableCell>
+                                    }
                                 }).collect::<Html>()
                             }
                         </TableRow>

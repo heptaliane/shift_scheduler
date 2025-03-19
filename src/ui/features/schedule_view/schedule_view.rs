@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use yew::{
     function_component, html, use_state_eq, AttrValue, Callback, Html, MouseEvent, Properties,
 };
