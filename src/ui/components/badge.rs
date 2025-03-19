@@ -8,7 +8,6 @@ pub struct BadgeProps {
     pub variant: AttrValue,
 }
 
-
 #[function_component]
 pub fn Badge(props: &BadgeProps) -> Html {
     html! {

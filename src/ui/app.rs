@@ -1,9 +1,9 @@
 use yew::prelude::{function_component, html, use_state_eq, AttrValue, Callback, Html};
 
 use super::components::nav::{Nav, NavItem};
-use super::data::{DateConfig, UserConfig, WorkType, UserTag};
-use super::features::schedule_view::schedule_view::ScheduleView;
+use super::data::{DateConfig, UserConfig, UserTag, WorkType};
 use super::features::config_view::config_view::ConfigView;
+use super::features::schedule_view::schedule_view::ScheduleView;
 
 #[function_component(App)]
 pub fn app() -> Html {

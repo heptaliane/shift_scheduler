@@ -1,8 +1,8 @@
 use web_sys::wasm_bindgen::JsCast;
 use web_sys::HtmlAnchorElement;
 use yew::{
-    function_component, html, use_state_eq, AttrValue, Callback, ChildrenWithProps, MouseEvent, Html,
-    Properties,
+    function_component, html, use_state_eq, AttrValue, Callback, ChildrenWithProps, Html,
+    MouseEvent, Properties,
 };
 
 #[derive(Properties, PartialEq)]
