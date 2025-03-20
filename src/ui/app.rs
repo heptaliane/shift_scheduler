@@ -10,7 +10,10 @@ pub fn app() -> Html {
     let users = use_state_eq(|| Vec::<UserConfig>::new());
     let dates = use_state_eq(|| Vec::<DateConfig>::new());
     let tags = use_state_eq(|| Vec::<UserTag>::new());
-    let worktypes = use_state_eq(|| Vec::<WorkType>::new());
+    let worktypes = use_state_eq(|| vec![
+        WorkType { id: 0, name: AttrValue::from("o"), color: AttrValue::from("#7fffd4") },
+        WorkType { id: 1, name: AttrValue::from("x"), color: AttrValue::from("#d3d3d3") },
+    ]);
     let handle_schedule_submit = {
         Callback::from(move |schedule: Vec<Vec<Option<usize>>>| {
             // TODO: implememnt ga
